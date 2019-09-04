@@ -42,7 +42,6 @@ for k in range(len(basin_names))[2::5]:
 ## Calculate the effect of including glaciers in each basin
 glacierdiff = wrunoff_array - norunoff_array
 basin_mean = [np.nanmean(glacierdiff[j]) for j in range(len(basin_names))]
-normalized_basin_mean = [np.nanmean(glacierdiff[j])/np.nanmean(norunoff_array[j]) for j in range(len(basin_names))]
 
 ## Compare effect across models - read in all to dict
 SPEI_by_model = {m: {} for m in modelnames} # create dictionary indexed by model name
