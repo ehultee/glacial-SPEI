@@ -64,14 +64,20 @@ for k,m in enumerate(modelnames):
 plt.legend(loc='best')
 plt.show()
 
-## 30-yr period means
+## 30-yr period means and variance
 modelmeans_1950_1980 = {m: [] for m in modelnames} #dictionary indexed by model name
+modelvar_1950_1980 = {m: [] for m in modelnames}
 modelmeans_2070_2100 = {m: [] for m in modelnames}
+modelvar_2070_2100 = {m: [] for m in modelnames}
 mean_shifts = {m: [] for m in modelnames}
 
 for m in modelnames:
     means_i = [np.nanmean(SPEI_by_model[m]['diff'][j][600:971]) for j in range(len(basin_names))]
+    var_i = [np.nanvar(SPEI_by_model[m]['diff'][j][600:971]) for j in range(len(basin_names))]
     means_f = [np.nanmean(SPEI_by_model[m]['diff'][j][2039:2410]) for j in range(len(basin_names))]
+    var_f = [np.nanvar(SPEI_by_model[m]['diff'][j][2039:2410]) for j in range(len(basin_names))]
     modelmeans_1950_1980[m] = means_i
+    modelvar_1950_1980[m] = var_i
     modelmeans_2070_2100[m] = means_f
-    mean_shifts[m] = means_f - means_i
+    modelvar_2070_2100[m] = var_f
+    mean_shifts[m] = np.array(means_f) - np.array(means_i)
