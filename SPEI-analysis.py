@@ -20,8 +20,8 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
 ## Read in two files (no runoff, with runoff for same model)
-norunoff_fn = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[0], modelnames[0], scenarios[1])
-wrunoff_fn = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[0], modelnames[0], scenarios[1])
+norunoff_fn = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], modelnames[0], scenarios[1])
+wrunoff_fn = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], modelnames[0], scenarios[1])
 
 norunoff_array = np.loadtxt(norunoff_fn)
 wrunoff_array = np.loadtxt(wrunoff_fn)
