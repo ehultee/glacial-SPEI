@@ -56,4 +56,11 @@ for m in modelnames:
 ## 30-yr running means
 window_yrs = 30 # how many years to include in moving average
 window_size = 12 * window_yrs # size of window given monthly data
-test_runavg = np.convolve(SPEI_by_model['CanESM2']['diff'][0], np.ones((window_size,))/window_size, mode='valid')
+
+which_basin = 1 # choose a basin by its index in basin_names above
+basin_runavg_bymodel = [np.convolve(SPEI_by_model[m]['diff'][which_basin], np.ones((window_size,))/window_size, mode='valid') for m in modelnames]
+plt.figure('{} year running average glacial effect, {} basin'.format(window_yrs, basin_names[which_basin]))
+for k,m in enumerate(modelnames):
+    plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m)
+plt.legend(loc='best')
+plt.show()
