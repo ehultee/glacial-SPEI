@@ -51,3 +51,9 @@ for m in modelnames:
     wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
     SPEI_by_model[m]['NRunoff'] = np.loadtxt(norunoff_f_m)
     SPEI_by_model[m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
+    SPEI_by_model[m]['diff'] = SPEI_by_model[m]['WRunoff'] - SPEI_by_model[m]['NRunoff']
+
+## 30-yr running means
+window_yrs = 30 # how many years to include in moving average
+window_size = 12 * window_yrs # size of window given monthly data
+test_runavg = np.convolve(SPEI_by_model['CanESM2']['diff'][0], np.ones((window_size,))/window_size, mode='valid')
