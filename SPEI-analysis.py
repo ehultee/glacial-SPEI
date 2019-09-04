@@ -44,4 +44,10 @@ glacierdiff = wrunoff_array - norunoff_array
 basin_mean = [np.nanmean(glacierdiff[j]) for j in range(len(basin_names))]
 normalized_basin_mean = [np.nanmean(glacierdiff[j])/np.nanmean(norunoff_array[j]) for j in range(len(basin_names))]
 
-## 30-yr means
+## Compare effect across models - read in all to dict
+SPEI_by_model = {m: {} for m in modelnames} # create dictionary indexed by model name
+for m in modelnames:
+    norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
+    wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
+    SPEI_by_model[m]['NRunoff'] = np.loadtxt(norunoff_f_m)
+    SPEI_by_model[m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
