@@ -46,8 +46,8 @@ basin_mean = [np.nanmean(glacierdiff[j]) for j in range(len(basin_names))]
 ## Compare effect across models - read in all to dict
 SPEI_by_model = {m: {} for m in modelnames} # create dictionary indexed by model name
 for m in modelnames:
-    norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
-    wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
+    norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[0])
+    wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[0])
     SPEI_by_model[m]['NRunoff'] = np.loadtxt(norunoff_f_m)
     SPEI_by_model[m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
     SPEI_by_model[m]['diff'] = SPEI_by_model[m]['WRunoff'] - SPEI_by_model[m]['NRunoff']
@@ -107,4 +107,6 @@ plt.figure('Mean and variance shifts per basin')
 plt.errorbar(x=basin_meanshift_meds, y=basin_varshift_meds, xerr=basin_meanshift_range, yerr=basin_varshift_range, ls='')
 plt.axes().set_xlabel('Difference in 30-yr mean SPEI', fontsize=16)
 plt.axes().set_ylabel('Difference in SPEI variance', fontsize=16)
+plt.axes().set_ylim(-0.5, 2.5)
+plt.axes().set_xlim(-1, 5)
 plt.show()
