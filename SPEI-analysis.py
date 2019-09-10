@@ -83,3 +83,26 @@ for m in modelnames:
     modelvar_2070_2100[m] = var_f
     mean_shifts[m] = np.array(means_f) - np.array(means_i)
     var_shifts[m] = np.array(var_f) - np.array(var_i)
+
+basin_mean_shifts = {b: [] for b in basin_names} #dictionary indexed by basin name
+basin_var_shifts = {b: [] for b in basin_names} #dictionary indexed by model name
+basin_meanshift_meds = [] #arrays for plotting
+basin_varshift_meds = []
+basin_meanshift_range = []
+basin_varshift_range = []
+
+for i, b in enumerate(basin_names):
+    bmeans_i = [np.nanmean(SPEI_by_model[m]['diff'][i][600:971]) for m in modelnames]
+    bvar_i = [np.nanvar(SPEI_by_model[m]['diff'][i][600:971]) for m in modelnames]
+    bmeans_f = [np.nanmean(SPEI_by_model[m]['diff'][i][2039:2410]) for m in modelnames]
+    bvar_f = [np.nanvar(SPEI_by_model[m]['diff'][i][2039:2410]) for m in modelnames]
+    basin_mean_shifts[b] = np.array(bmeans_f) - np.array(bmeans_i)
+    basin_var_shifts[b] = np.array(bvar_f) - np.array(bvar_i)
+    basin_meanshift_meds.append(np.nanmedian(basin_mean_shifts[b]))
+    basin_varshift_meds.append(np.nanmedian(basin_var_shifts[b]))
+    basin_meanshift_range.append(np.nanmax(basin_mean_shifts[b]) - np.nanmin(basin_mean_shifts[b]))
+    basin_varshift_range.append(np.nanmax(basin_var_shifts[b]) - np.nanmin(basin_var_shifts[b]))
+
+plt.figure('Mean and variance shifts per basin')
+plt.errorbar(x=basin_meanshift_meds, y=basin_varshift_meds, xerr=basin_meanshift_range, yerr=basin_varshift_range)
+plt.show()
