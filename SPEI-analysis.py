@@ -70,6 +70,7 @@ modelvar_1950_1980 = {m: [] for m in modelnames}
 modelmeans_2070_2100 = {m: [] for m in modelnames}
 modelvar_2070_2100 = {m: [] for m in modelnames}
 mean_shifts = {m: [] for m in modelnames}
+var_shifts = {m: [] for m in modelnames}
 
 for m in modelnames:
     means_i = [np.nanmean(SPEI_by_model[m]['diff'][j][600:971]) for j in range(len(basin_names))]
@@ -81,3 +82,4 @@ for m in modelnames:
     modelmeans_2070_2100[m] = means_f
     modelvar_2070_2100[m] = var_f
     mean_shifts[m] = np.array(means_f) - np.array(means_i)
+    var_shifts[m] = np.array(var_f) - np.array(var_i)
