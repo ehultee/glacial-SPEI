@@ -80,10 +80,12 @@ for i, b in enumerate(basin_names):
     basin_varshift_range.append(np.nanmax(basin_var_shifts[b]) - np.nanmin(basin_var_shifts[b]))
 
 
-plt.figure('Mean and variance shifts per basin for WRunoff case')
+plt.figure('Mean and variance shifts, 2070-2100 versus 1950-1980, per basin for WRunoff case')
 plt.errorbar(x=basin_meanshift_meds, y=basin_varshift_meds, xerr=basin_meanshift_range, yerr=basin_varshift_range, ls='')
 plt.axes().set_xlabel('Difference in 30-yr mean SPEI', fontsize=16)
 plt.axes().set_ylabel('Difference in SPEI variance', fontsize=16)
 plt.axes().set_ylim(-0.5, 2.5)
 plt.axes().set_xlim(-1, 5)
 plt.show()
+
+
