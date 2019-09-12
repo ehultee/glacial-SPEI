@@ -21,25 +21,8 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 'LULE','RAPEL','SANTA','SKAGIT','KUBAN','TITICACA','NUSHAGAK','BIOBIO','IRRAWADDY','NEGRO','MAJES','CLUTHA','DAULE/VINCES',
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
-## Read in two files (no runoff, with runoff for same model)
-norunoff_fn = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], modelnames[0], scenarios[1])
-wrunoff_fn = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], modelnames[0], scenarios[1])
-
-norunoff_array = np.loadtxt(norunoff_fn)
-wrunoff_array = np.loadtxt(wrunoff_fn)
-
 yrs = np.linspace(1900, 2101, num=2412)
 
-for k in range(len(basin_names))[2::5]:
-    plt.figure('Basin {}'.format(basin_names[k]))
-    plt.plot(yrs, norunoff_array[k], color='k')
-    plt.plot(yrs, wrunoff_array[k], color='b')
-    plt.show()
-
-for k in range(len(basin_names))[2::5]:
-    plt.figure('{} Basin glacier effect'.format(basin_names[k]))
-    plt.plot(yrs, wrunoff_array[k]-norunoff_array[k], color='k')
-    plt.show()
     
 ## Calculate the effect of including glaciers in each basin
 glacierdiff = wrunoff_array - norunoff_array
