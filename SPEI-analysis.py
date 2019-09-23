@@ -85,32 +85,9 @@ plt.axes().set_xlim(-1, 5)
 plt.show()
 
 
-## Calculate changes due to glacial effect at end of century
-basin_glacial_meanshift = {b: [] for b in basin_names}
-basin_glacial_varshift = {b: [] for b in basin_names}
-bas_glac_meanmed = []
-bas_glac_varmed = []
-bas_glac_lowmeans = [] #where to plot lower end of leg (difference between min value and median)
-bas_glac_highmeans = []
-bas_glac_lowvars = []
-bas_glac_highvars = []
-
-for i, b in enumerate(basin_names):
-    bmeans_n = [np.nanmean(SPEI_by_model[m]['NRunoff'][i][2039:2410]) for m in modelnames]
-    bvar_n = [np.nanvar(SPEI_by_model[m]['NRunoff'][i][2039:2410]) for m in modelnames]
-    bmeans_g = [np.nanmean(SPEI_by_model[m]['WRunoff'][i][2039:2410]) for m in modelnames]
-    bvar_g = [np.nanvar(SPEI_by_model[m]['WRunoff'][i][2039:2410]) for m in modelnames]
-    basin_glacial_meanshift[b] = np.array(bmeans_g) - np.array(bmeans_n)
-    basin_glacial_varshift[b] = np.array(bvar_g) - np.array(bvar_n)
-    bas_glac_meanmed.append(np.nanmedian(basin_glacial_meanshift[b]))
-    bas_glac_varmed.append(np.nanmedian(basin_glacial_varshift[b]))
-    bas_glac_lowmeans.append(np.nanmedian(basin_glacial_meanshift[b]) - np.nanmin(basin_glacial_meanshift[b]))
-    bas_glac_highmeans.append(np.nanmax(basin_glacial_meanshift[b]) - np.nanmedian(basin_glacial_meanshift[b]))
-    bas_glac_lowvars.append(np.nanmedian(basin_glacial_varshift[b]) - np.nanmin(basin_glacial_varshift[b]))
-    bas_glac_highvars.append(np.nanmax(basin_glacial_varshift[b]) - np.nanmedian(basin_glacial_varshift[b]))
-
-mean_spread = np.stack((bas_glac_lowmeans, bas_glac_highmeans))
-var_spread = np.stack((bas_glac_lowvars, bas_glac_highvars))
+## Calculate changes due to glacial effect at end of century, using gSPEI functions
+bas_glac_meanmed, mean_spread = glacial_meandiff(SPEI_by_model)
+bas_glac_varmed, var_spread = glacial_vardiff(SPEI_by_model)
 
 plt.figure('Mean and variance shifts due to glacial effects in 2070-2100')
 plt.errorbar(x=bas_glac_meanmed, y=bas_glac_varmed, xerr=mean_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
