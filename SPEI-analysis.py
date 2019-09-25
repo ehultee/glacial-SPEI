@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from gSPEI import *
 
-fpath = 'Documents/6. MIT/Drought buffering/SPEI_files/' 
+fpath = 'Documents/GitHub/glacial-SPEI/data/SPEI_Files/' 
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used
