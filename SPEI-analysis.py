@@ -101,6 +101,6 @@ plt.show()
 
 
 ## Plot mean effect by percent glaciated
-plt.figure('Mean shift by area percent glaciation')
-plt.plot(range(len(basin_names)), bas_glac_meanmed) #basin names are in descending order of % glaciated
+plt.figure('Mean shift by glaciated area')
+plt.plot(range(len(basin_names)), bas_glac_meanmed) #basin names are in descending order of total glaciated area
 plt.show()
