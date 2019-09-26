@@ -33,7 +33,7 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
     basin_runavg_bymodel = [np.convolve(permodel_dict[m][which][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     colors = cm.get_cmap(cmap_name)(np.linspace(0, 1, num=len(model_names)))
     styles = ('-',':')
-    plt.figure('{} year running average glacial effect, {} basin'.format(window_yrs, basin_names[basin_id]))
+    plt.figure('{} year running average, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]))
     for k,m in enumerate(model_names):
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     plt.legend(loc='best')
@@ -41,7 +41,8 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
     if show_plot:
         plt.show()
     if save_plot:
-        plt.savefig(fname='{}yr_runmean-{}_basin-{}.png'.format(window_yrs, basin_names[basin_id], date.today()))
+        plt.savefig(fname='{}yr_runmean-{}-{}_basin-{}.png'.format(window_yrs, which, basin_names[basin_id], date.today()))
+    
 
 def glacial_meandiff(permodel_dict, years=(2070, 2100), return_range=True):
     """Calculate the difference in 30-yr mean SPEI with vs. without runoff
