@@ -57,8 +57,8 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
     window_size = 12 * window_yrs # size of window given monthly data
     basin_runavg_w = [np.convolve(permodel_dict[m]['WRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     basin_runavg_n = [np.convolve(permodel_dict[m]['NRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
-    colors_w = cm.get_cmap(cmaps[0])(np.linspace(0, 1, num=len(model_names)))
-    colors_n = cm.get_cmap(cmaps[1])(np.linspace(0, 1, num=len(model_names)))
+    colors_w = cm.get_cmap(cmaps[0])(np.linspace(0.2, 1, num=len(model_names)))
+    colors_n = cm.get_cmap(cmaps[1])(np.linspace(0.2, 1, num=len(model_names)))
     plt.figure('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]))
     plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
