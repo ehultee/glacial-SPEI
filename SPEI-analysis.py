@@ -36,6 +36,7 @@ for m in modelnames:
 ### 30-yr running means
 plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model)
 plot_basin_runmean(basin_id=0, permodel_dict=SPEI_by_model, which='NRunoff', cmap_name='Greys')
+plot_runmean_comparison(basin_id=1, permodel_dict=SPEI_by_model)
 
 ## 30-yr period means and variance
 modelmeans_1950_1980 = {m: [] for m in modelnames} #dictionary indexed by model name
