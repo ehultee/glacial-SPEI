@@ -3,7 +3,7 @@
 ## Code: EHU | Data: SC
 
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from gSPEI import *
@@ -102,26 +102,28 @@ bas_glac_varmed, var_spread = glacial_vardiff(SPEI_by_model)
 
 
 ### Plot running SPEI variance
-SPEIvar_by_model = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in modelnames}
-varwindow = 360 # number of months to window in rolling variance
-for m in modelnames:
-    for i in range(len(basin_names)):
-        nr = pd.Series(SPEI_by_model[m]['NRunoff'][i])
-        wr = pd.Series(SPEI_by_model[m]['WRunoff'][i])
-        v_nr = pd.rolling_var(nr, varwindow)
-        v_wr = pd.rolling_var(wr, varwindow)
-        SPEIvar_by_model[m]['NRunoff'].append(v_nr)
-        SPEIvar_by_model[m]['WRunoff'].append(v_wr)
-        SPEIvar_by_model[m]['diff'].append(v_wr - v_nr)
-        
-colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
-colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
-b=2
-plt.figure('{} year running average trajectories, {} basin'.format(varwindow, basin_names[b]))
-plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
-for k,m in enumerate(model_names):
-    plt.plot(yrs, SPEIvar_by_model[m]['WRunoff'][b], label=m, color=colors_w[k], linewidth=2.0)
-    plt.plot(yrs, SPEIvar_by_model[m]['NRunoff'][b], ls='-.', color=colors_n[k], linewidth=2.0)
-plt.legend(loc='best')
-plt.tight_layout()
-plt.show()
+#SPEIvar_by_model = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in modelnames}
+#varwindow = 360 # number of months to window in rolling variance
+#for m in modelnames:
+#    for i in range(len(basin_names)):
+#        nr = pd.Series(SPEI_by_model[m]['NRunoff'][i])
+#        wr = pd.Series(SPEI_by_model[m]['WRunoff'][i])
+#        v_nr = pd.rolling_var(nr, varwindow)
+#        v_wr = pd.rolling_var(wr, varwindow)
+#        SPEIvar_by_model[m]['NRunoff'].append(v_nr)
+#        SPEIvar_by_model[m]['WRunoff'].append(v_wr)
+#        SPEIvar_by_model[m]['diff'].append(v_wr - v_nr)
+#        
+#colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
+#colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
+#b=2
+#plt.figure('{} year running average trajectories, {} basin'.format(varwindow, basin_names[b]))
+#plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
+#for k,m in enumerate(model_names):
+#    plt.plot(yrs, SPEIvar_by_model[m]['WRunoff'][b], label=m, color=colors_w[k], linewidth=2.0)
+#    plt.plot(yrs, SPEIvar_by_model[m]['NRunoff'][b], ls='-.', color=colors_n[k], linewidth=2.0)
+#plt.legend(loc='best')
+#plt.tight_layout()
+#plt.show()
+
+plot_basin_runvar(1, SPEI_by_model)

@@ -93,10 +93,11 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
         basin_dict[m]['diff'] = basin_dict[m]['WRunoff'] - basin_dict[m]['NRunoff']
             
     colors = cm.get_cmap(cmaps)(np.linspace(0.2, 1, num=len(model_names)))
+    styles = ('-',':')
     plt.figure('{} year running average trajectories, {} basin'.format(varwindow, basin_names[basin_id]))
     plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
-        plt.plot(yrs, basin_dict[m][which], label=m, color=colors[k], linewidth=2.0)
+        plt.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     plt.legend(loc='best')
     plt.tight_layout()
     if show_plot:
