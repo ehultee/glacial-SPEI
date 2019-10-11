@@ -3,6 +3,7 @@
 ## Code: EHU | Data: SC
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from gSPEI import *
@@ -35,7 +36,7 @@ for m in modelnames:
 
 ### 30-yr running means
 plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model)
-plot_basin_runmean(basin_id=0, permodel_dict=SPEI_by_model, which='NRunoff', cmap_name='Greys')
+plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model, which='NRunoff', cmap_name='Greys')
 plot_runmean_comparison(basin_id=1, permodel_dict=SPEI_by_model)
 
 ## 30-yr period means and variance
@@ -91,16 +92,35 @@ plt.show()
 bas_glac_meanmed, mean_spread = glacial_meandiff(SPEI_by_model)
 bas_glac_varmed, var_spread = glacial_vardiff(SPEI_by_model)
 
-plt.figure('Mean and variance shifts due to glacial effects in 2070-2100')
-plt.errorbar(x=bas_glac_meanmed, y=bas_glac_varmed, xerr=mean_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
-plt.axes().set_xlabel('Difference in mean SPEI', fontsize=16)
-plt.axes().set_ylabel('Difference in SPEI variance', fontsize=16)
-plt.axes().set_ylim(-1.5, 1.0)
-plt.axes().set_xlim(-0.5, 5)
-plt.show()
+#plt.figure('Mean and variance shifts due to glacial effects in 2070-2100')
+#plt.errorbar(x=bas_glac_meanmed, y=bas_glac_varmed, xerr=mean_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
+#plt.axes().set_xlabel('Difference in mean SPEI', fontsize=16)
+#plt.axes().set_ylabel('Difference in SPEI variance', fontsize=16)
+#plt.axes().set_ylim(-1.5, 1.0)
+#plt.axes().set_xlim(-0.5, 5)
+#plt.show()
 
 
-## Plot mean effect by percent glaciated
-plt.figure('Mean shift by glaciated area')
-plt.plot(range(len(basin_names)), bas_glac_meanmed) #basin names are in descending order of total glaciated area
+### Plot running SPEI variance
+SPEIvar_by_model = {m: {'NRunoff': [], 'WRunoff': []} for m in modelnames}
+varwindow = 360 # number of months to window in rolling variance
+for m in modelnames:
+    for i in range(len(basin_names)):
+        nr = pd.Series(SPEI_by_model[m]['NRunoff'][i])
+        wr = pd.Series(SPEI_by_model[m]['WRunoff'][i])
+        v_nr = pd.rolling_var(nr, varwindow)
+        v_wr = pd.rolling_var(wr, varwindow)
+        SPEIvar_by_model[m]['NRunoff'].append(v_nr)
+        SPEIvar_by_model[m]['WRunoff'].append(v_wr)
+        
+colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
+colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
+b=2
+plt.figure('{} year running average trajectories, {} basin'.format(varwindow, basin_names[b]))
+plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
+for k,m in enumerate(model_names):
+    plt.plot(yrs, SPEIvar_by_model[m]['WRunoff'][b], label=m, color=colors_w[k], linewidth=2.0)
+    plt.plot(yrs, SPEIvar_by_model[m]['NRunoff'][b], ls='-.', color=colors_n[k], linewidth=2.0)
+plt.legend(loc='best')
+plt.tight_layout()
 plt.show()
