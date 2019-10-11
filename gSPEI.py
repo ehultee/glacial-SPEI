@@ -3,6 +3,7 @@
 ## 12 Sept 2019
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from datetime import date
@@ -70,6 +71,38 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
         plt.show()
     if save_plot:
         plt.savefig(fname='{}yr_runmean_comp-{}_basin-{}.png'.format(window_yrs, basin_names[basin_id], date.today()))
+
+
+def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_plot=True, save_plot=False):
+    """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
+    Arguments:
+        basin_id: integer, index of basin in the standard list "basin_names"
+        permodel_dict: dictionary storing SPEI per model, with the structure dict[modelname]['diff'/'WRunoff'/'NRunoff'][basinname] = basin difference in SPEI for this model
+        window_yrs: number of years to consider in running average.  Default 30
+        cmaps: tuple (str, str) of matplotlib colormap names from which to select line colors for each case. Default ('Blues', 'Greys')
+        show_plot: Boolean, whether to show the resulting plot.  Default True
+        save_plot: Boolean, whether to save the plot in the working directory.  Default False
+    """
+    basin_dict = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in model_names}
+    varwindow = 12*window_yrs # number of months to window in rolling variance
+    for m in model_names:
+        nr = pd.Series(permodel_dict[m]['NRunoff'][basin_id])
+        wr = pd.Series(permodel_dict[m]['WRunoff'][basin_id])
+        basin_dict[m]['NRunoff'] = pd.rolling_var(nr, varwindow)
+        basin_dict[m]['WRunoff'] = pd.rolling_var(wr, varwindow)
+        basin_dict[m]['diff'] = basin_dict[m]['WRunoff'] - basin_dict[m]['NRunoff']
+            
+    colors = cm.get_cmap(cmaps)(np.linspace(0.2, 1, num=len(model_names)))
+    plt.figure('{} year running average trajectories, {} basin'.format(varwindow, basin_names[basin_id]))
+    plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
+    for k,m in enumerate(model_names):
+        plt.plot(yrs, basin_dict[m][which], label=m, color=colors[k], linewidth=2.0)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    if show_plot:
+        plt.show()
+    if save_plot:
+        plt.savefig(fname='{}yr_runvar-{}-{}_basin-{}.png'.format(window_yrs, which, basin_names[basin_id], date.today()))
 
     
 
