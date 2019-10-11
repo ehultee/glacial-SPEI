@@ -102,7 +102,7 @@ bas_glac_varmed, var_spread = glacial_vardiff(SPEI_by_model)
 
 
 ### Plot running SPEI variance
-SPEIvar_by_model = {m: {'NRunoff': [], 'WRunoff': []} for m in modelnames}
+SPEIvar_by_model = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in modelnames}
 varwindow = 360 # number of months to window in rolling variance
 for m in modelnames:
     for i in range(len(basin_names)):
@@ -112,6 +112,7 @@ for m in modelnames:
         v_wr = pd.rolling_var(wr, varwindow)
         SPEIvar_by_model[m]['NRunoff'].append(v_nr)
         SPEIvar_by_model[m]['WRunoff'].append(v_wr)
+        SPEIvar_by_model[m]['diff'].append(v_wr - v_nr)
         
 colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
 colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
