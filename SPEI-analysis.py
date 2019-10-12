@@ -28,8 +28,8 @@ yrs = np.linspace(1900, 2101, num=2412)
 ## Compare effect across models - read in all to dict
 SPEI_by_model = {m: {} for m in modelnames} # create dictionary indexed by model name
 for m in modelnames:
-    norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[0])
-    wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[0])
+    norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
+    wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
     SPEI_by_model[m]['NRunoff'] = np.loadtxt(norunoff_f_m)
     SPEI_by_model[m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
     SPEI_by_model[m]['diff'] = SPEI_by_model[m]['WRunoff'] - SPEI_by_model[m]['NRunoff']
@@ -127,3 +127,6 @@ bas_glac_varmed, var_spread = glacial_vardiff(SPEI_by_model)
 #plt.show()
 
 plot_basin_runvar(1, SPEI_by_model)
+plot_basin_runvar(4, SPEI_by_model)
+plot_basin_runvar(26, SPEI_by_model)
+plot_basin_runvar(-7, SPEI_by_model)
