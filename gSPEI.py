@@ -88,8 +88,8 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
     for m in model_names:
         nr = pd.Series(permodel_dict[m]['NRunoff'][basin_id])
         wr = pd.Series(permodel_dict[m]['WRunoff'][basin_id])
-        basin_dict[m]['NRunoff'] = pd.rolling_var(nr, varwindow)
-        basin_dict[m]['WRunoff'] = pd.rolling_var(wr, varwindow)
+        basin_dict[m]['NRunoff'] = nr.rolling(window=varwindow).var()
+        basin_dict[m]['WRunoff'] = wr.rolling(window=varwindow).var()
         basin_dict[m]['diff'] = basin_dict[m]['WRunoff'] - basin_dict[m]['NRunoff']
             
     colors = cm.get_cmap(cmaps)(np.linspace(0.2, 1, num=len(model_names)))
