@@ -19,7 +19,7 @@ scenarios = ['Rcp4p5', 'Rcp8p5'] # climate scenarios
 basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON','ALSEK','SUSITNA','BALKHASH','STIKINE','SANTA CRUZ',
 'FRASER','BAKER','YANGTZE','SALWEEN','COLUMBIA','ISSYK-KUL','AMAZON','COLORADO','TAKU','MACKENZIE','NASS','THJORSA','JOEKULSA A F.',
 'KUSKOKWIM','RHONE','SKEENA','OB','OELFUSA','MEKONG','DANUBE','NELSON RIVER','PO','KAMCHATKA','RHINE','GLOMA','HUANG HE','INDIGIRKA',
-'LULE','RAPEL','SANTA','SKAGIT','KUBAN','TITICACA','NUSHAGAK','BIOBIO','IRRAWADDY','NEGRO','MAJES','CLUTHA','DAULE/VINCES',
+'LULE','RAPEL','SANTA','SKAGIT','KUBAN','TITICACA','NUSHAGAK','BIOBIO','IRRAWADDY','NEGRO','MAJES','CLUTHA','DAULE-VINCES',
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
 yrs = np.linspace(1900, 2101, num=2412)
@@ -35,9 +35,12 @@ for m in modelnames:
     SPEI_by_model[m]['diff'] = SPEI_by_model[m]['WRunoff'] - SPEI_by_model[m]['NRunoff']
 
 ### 30-yr running means
-plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model)
-plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model, which='NRunoff', cmap_name='Greys')
-plot_runmean_comparison(basin_id=1, permodel_dict=SPEI_by_model)
+# plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model)
+# plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model, which='NRunoff', cmap_name='Greys')
+# plot_runmean_comparison(basin_id=1, permodel_dict=SPEI_by_model)
+# for i, b in enumerate(basin_names):
+#     plot_basin_runmean(basin_id=i, permodel_dict=SPEI_by_model, save_plot=True, show_plot=False)
+#     plot_basin_runvar(basin_id=i, permodel_dict=SPEI_by_model, save_plot=True, show_plot=False)
 
 ## 30-yr period means and variance
 modelmeans_1950_1980 = {m: [] for m in modelnames} #dictionary indexed by model name
