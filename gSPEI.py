@@ -19,7 +19,7 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
 
-def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_plot=True, save_plot=False):
+def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_labels=True, show_plot=True, save_plot=False):
     """Make a plot of running mean difference in SPEI for a given basin, comparing across models.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -37,6 +37,11 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
     plt.figure('{} year running average, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]))
     for k,m in enumerate(model_names):
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
+    plt.tick_params(axis='both', labelsize=12)
+    if show_labels:
+        plt.axes().set_xlabel('Years', fontsize=14)
+        plt.axes().set_ylabel('SPEI {}'.format(which), fontsize=14)
+        plt.title('{} year running mean, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
     plt.legend(loc='best')
     plt.tight_layout()
     if show_plot:
@@ -73,7 +78,7 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
         plt.savefig(fname='{}yr_runmean_comp-{}_basin-{}.png'.format(window_yrs, basin_names[basin_id], date.today()))
 
 
-def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_plot=True, save_plot=False):
+def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False):
     """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -98,6 +103,11 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
     plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
         plt.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
+    plt.tick_params(axis='both', labelsize=12)
+    if show_labels:
+        plt.axes().set_xlabel('Years', fontsize=14)
+        plt.axes().set_ylabel('SPEI {}'.format(which), fontsize=14)
+        plt.title('{} year running variance by model, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
     plt.legend(loc='best')
     plt.tight_layout()
     if show_plot:
