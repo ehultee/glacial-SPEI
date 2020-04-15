@@ -38,6 +38,7 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
     for k,m in enumerate(model_names):
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     plt.tick_params(axis='both', labelsize=12)
+    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
     if show_labels:
         plt.axes().set_xlabel('Years', fontsize=14)
         plt.axes().set_ylabel('SPEI {}'.format(which), fontsize=14)
@@ -70,7 +71,8 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
     for k,m in enumerate(model_names):
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_n[k], ls='-.', color=colors_n[k], linewidth=2.0)
-        plt.tick_params(axis='both', labelsize=12)
+    plt.tick_params(axis='both', labelsize=12)
+    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
     if show_labels:
         plt.axes().set_xlabel('Years', fontsize=14)
         plt.axes().set_ylabel('SPEI', fontsize=14)
@@ -109,6 +111,7 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
     for k,m in enumerate(model_names):
         plt.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     plt.tick_params(axis='both', labelsize=12)
+    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
     if show_labels:
         plt.axes().set_xlabel('Years', fontsize=14)
         plt.axes().set_ylabel('SPEI {}'.format(which), fontsize=14)
