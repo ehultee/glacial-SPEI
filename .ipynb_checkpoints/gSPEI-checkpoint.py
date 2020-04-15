@@ -3,6 +3,7 @@
 ## 12 Sept 2019
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from datetime import date
@@ -14,33 +15,115 @@ scenarios = ['Rcp4p5', 'Rcp8p5'] # climate scenarios
 basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON','ALSEK','SUSITNA','BALKHASH','STIKINE','SANTA CRUZ',
 'FRASER','BAKER','YANGTZE','SALWEEN','COLUMBIA','ISSYK-KUL','AMAZON','COLORADO','TAKU','MACKENZIE','NASS','THJORSA','JOEKULSA A F.',
 'KUSKOKWIM','RHONE','SKEENA','OB','OELFUSA','MEKONG','DANUBE','NELSON RIVER','PO','KAMCHATKA','RHINE','GLOMA','HUANG HE','INDIGIRKA',
-'LULE','RAPEL','SANTA','SKAGIT','KUBAN','TITICACA','NUSHAGAK','BIOBIO','IRRAWADDY','NEGRO','MAJES','CLUTHA','DAULE/VINCES',
+'LULE','RAPEL','SANTA','SKAGIT','KUBAN','TITICACA','NUSHAGAK','BIOBIO','IRRAWADDY','NEGRO','MAJES','CLUTHA','DAULE-VINCES',
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
 
-def plot_basin_runmean(basin_id, permodel_dict, window_yrs=30, cmap_name='viridis', show_plot=True, save_plot=False):
+def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_labels=True, show_plot=True, save_plot=False):
     """Make a plot of running mean difference in SPEI for a given basin, comparing across models.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
-        permodel_dict: dictionary storing SPEI per model, with the structure dict[modelname]['diff'][basinname] = basin difference in SPEI for this model
+        permodel_dict: dictionary storing SPEI per model, with the structure dict[modelname]['diff'/'WRunoff'/'NRunoff'][basinname] = basin difference in SPEI for this model
+        which: string identifying 'WRunoff' (with glacial runoff), 'NRunoff' (no runoff), or 'diff' (their difference)
         window_yrs: number of years to consider in running average.  Default 30
         cmap_name: name of matplotlib colormap from which to select line colors. Default 'viridis'
         show_plot: Boolean, whether to show the resulting plot.  Default True
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
     """
     window_size = 12 * window_yrs # size of window given monthly data
-    basin_runavg_bymodel = [np.convolve(permodel_dict[m]['diff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
+    basin_runavg_bymodel = [np.convolve(permodel_dict[m][which][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     colors = cm.get_cmap(cmap_name)(np.linspace(0, 1, num=len(model_names)))
     styles = ('-',':')
-    plt.figure('{} year running average glacial effect, {} basin'.format(window_yrs, basin_names[basin_id]))
+    plt.figure('{} year running average, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]))
     for k,m in enumerate(model_names):
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
+    plt.tick_params(axis='both', labelsize=12)
+    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
+    if show_labels:
+        plt.axes().set_xlabel('Years', fontsize=14)
+        plt.axes().set_ylabel('Mean SPEI {}'.format(which), fontsize=14)
+        plt.title('{} year running mean, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
     plt.legend(loc='best')
     plt.tight_layout()
     if show_plot:
         plt.show()
     if save_plot:
-        plt.savefig(fname='{}yr_runmean-{}_basin-{}.png'.format(window_yrs, basin_names[basin_id], date.today()))
+        plt.savefig(fname='{}yr_runmean-{}-{}_basin-{}.png'.format(window_yrs, which, basin_names[basin_id], date.today()))
+    
+
+def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_labels=True, show_plot=True, save_plot=False):
+    """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
+    Arguments:
+        basin_id: integer, index of basin in the standard list "basin_names"
+        permodel_dict: dictionary storing SPEI per model, with the structure dict[modelname]['diff'/'WRunoff'/'NRunoff'][basinname] = basin difference in SPEI for this model
+        window_yrs: number of years to consider in running average.  Default 30
+        cmaps: tuple (str, str) of matplotlib colormap names from which to select line colors for each case. Default ('Blues', 'Greys')
+        show_plot: Boolean, whether to show the resulting plot.  Default True
+        save_plot: Boolean, whether to save the plot in the working directory.  Default False
+    """
+    window_size = 12 * window_yrs # size of window given monthly data
+    basin_runavg_w = [np.convolve(permodel_dict[m]['WRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
+    basin_runavg_n = [np.convolve(permodel_dict[m]['NRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
+    colors_w = cm.get_cmap(cmaps[0])(np.linspace(0.2, 1, num=len(model_names)))
+    colors_n = cm.get_cmap(cmaps[1])(np.linspace(0.2, 1, num=len(model_names)))
+    plt.figure('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]))
+    plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
+    for k,m in enumerate(model_names):
+        plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
+        plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_n[k], ls='-.', color=colors_n[k], linewidth=2.0)
+    plt.tick_params(axis='both', labelsize=12)
+    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
+    if show_labels:
+        plt.axes().set_xlabel('Years', fontsize=14)
+        plt.axes().set_ylabel('SPEI', fontsize=14)
+        plt.title('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]), fontsize=16)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    if show_plot:
+        plt.show()
+    if save_plot:
+        plt.savefig(fname='{}yr_runmean_comp-{}_basin-{}.png'.format(window_yrs, basin_names[basin_id], date.today()))
+
+
+def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False):
+    """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
+    Arguments:
+        basin_id: integer, index of basin in the standard list "basin_names"
+        permodel_dict: dictionary storing SPEI per model, with the structure dict[modelname]['diff'/'WRunoff'/'NRunoff'][basinname] = basin difference in SPEI for this model
+        window_yrs: number of years to consider in running average.  Default 30
+        cmaps: tuple (str, str) of matplotlib colormap names from which to select line colors for each case. Default ('Blues', 'Greys')
+        show_plot: Boolean, whether to show the resulting plot.  Default True
+        save_plot: Boolean, whether to save the plot in the working directory.  Default False
+    """
+    basin_dict = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in model_names}
+    varwindow = 12*window_yrs # number of months to window in rolling variance
+    for m in model_names:
+        nr = pd.Series(permodel_dict[m]['NRunoff'][basin_id])
+        wr = pd.Series(permodel_dict[m]['WRunoff'][basin_id])
+        basin_dict[m]['NRunoff'] = nr.rolling(window=varwindow).var()
+        basin_dict[m]['WRunoff'] = wr.rolling(window=varwindow).var()
+        basin_dict[m]['diff'] = basin_dict[m]['WRunoff'] - basin_dict[m]['NRunoff']
+            
+    colors = cm.get_cmap(cmaps)(np.linspace(0.2, 1, num=len(model_names)))
+    styles = ('-',':')
+    plt.figure('{} year running variance by model, {} basin'.format(window_yrs, basin_names[basin_id]))
+    plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
+    for k,m in enumerate(model_names):
+        plt.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
+    plt.tick_params(axis='both', labelsize=12)
+    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
+    if show_labels:
+        plt.axes().set_xlabel('Years', fontsize=14)
+        plt.axes().set_ylabel('SPEI variance {}'.format(which), fontsize=14)
+        plt.title('{} year running variance by model, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    if show_plot:
+        plt.show()
+    if save_plot:
+        plt.savefig(fname='{}yr_runvar-{}-{}_basin-{}.png'.format(window_yrs, which, basin_names[basin_id], date.today()))
+
+    
 
 def glacial_meandiff(permodel_dict, years=(2070, 2100), return_range=True):
     """Calculate the difference in 30-yr mean SPEI with vs. without runoff
