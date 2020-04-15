@@ -19,7 +19,7 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
 
-def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_labels=True, show_plot=True, save_plot=False):
+def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None):
     """Make a plot of running mean difference in SPEI for a given basin, comparing across models.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -29,6 +29,7 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
         cmap_name: name of matplotlib colormap from which to select line colors. Default 'viridis'
         show_plot: Boolean, whether to show the resulting plot.  Default True
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
+        output_tag: anything special to note in output filename, e.g. global settings applied. Default None will label 'default'
     """
     window_size = 12 * window_yrs # size of window given monthly data
     basin_runavg_bymodel = [np.convolve(permodel_dict[m][which][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
@@ -48,10 +49,12 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
     if show_plot:
         plt.show()
     if save_plot:
-        plt.savefig(fname='{}yr_runmean-{}-{}_basin-{}.png'.format(window_yrs, which, basin_names[basin_id], date.today()))
+        if output_tag is None:
+            output_tag='default'
+        plt.savefig(fname='{}yr_runmean-{}-{}_basin-{}-{}.png'.format(window_yrs, which, basin_names[basin_id], output_tag, date.today()))
     
 
-def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_labels=True, show_plot=True, save_plot=False):
+def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_labels=True, show_plot=True, save_plot=False, output_tag=None):
     """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -60,6 +63,7 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
         cmaps: tuple (str, str) of matplotlib colormap names from which to select line colors for each case. Default ('Blues', 'Greys')
         show_plot: Boolean, whether to show the resulting plot.  Default True
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
+        output_tag: anything special to note, e.g. global settings applied. Default None will label 'default'
     """
     window_size = 12 * window_yrs # size of window given monthly data
     basin_runavg_w = [np.convolve(permodel_dict[m]['WRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
@@ -82,10 +86,12 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
     if show_plot:
         plt.show()
     if save_plot:
-        plt.savefig(fname='{}yr_runmean_comp-{}_basin-{}.png'.format(window_yrs, basin_names[basin_id], date.today()))
+        if output_tag is None:
+            output_tag='default'
+        plt.savefig(fname='{}yr_runmean_comp-{}_basin-{}-{}.png'.format(window_yrs, basin_names[basin_id], output_tag, date.today()))
 
 
-def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False):
+def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None):
     """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -94,6 +100,7 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
         cmaps: tuple (str, str) of matplotlib colormap names from which to select line colors for each case. Default ('Blues', 'Greys')
         show_plot: Boolean, whether to show the resulting plot.  Default True
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
+        output_tag: anything special to note, e.g. global settings applied. Default None will label 'default'
     """
     basin_dict = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in model_names}
     varwindow = 12*window_yrs # number of months to window in rolling variance
@@ -121,7 +128,9 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
     if show_plot:
         plt.show()
     if save_plot:
-        plt.savefig(fname='{}yr_runvar-{}-{}_basin-{}.png'.format(window_yrs, which, basin_names[basin_id], date.today()))
+        if output_tag is None:
+            output_tag='default'
+        plt.savefig(fname='{}yr_runvar-{}-{}_basin-{}-{}.png'.format(window_yrs, which, basin_names[basin_id], output_tag, date.today()))
 
     
 
