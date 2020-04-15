@@ -35,23 +35,23 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
     basin_runavg_bymodel = [np.convolve(permodel_dict[m][which][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     colors = cm.get_cmap(cmap_name)(np.linspace(0, 1, num=len(model_names)))
     styles = ('-',':')
-    plt.figure('{} year running average, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]))
+    fig, ax = plt.subplots()
     for k,m in enumerate(model_names):
-        plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
-    plt.tick_params(axis='both', labelsize=12)
-    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
+        ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
+    ax.tick_params(axis='both', labelsize=12)
+    ax.set_xticks([1900,1950, 2000, 2050, 2100])
     if show_labels:
-        plt.axes().set_xlabel('Years', fontsize=14)
-        plt.axes().set_ylabel('Mean SPEI {}'.format(which), fontsize=14)
-        plt.title('{} year running mean, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
-    plt.legend(loc='best')
+        ax.set_xlabel('Years', fontsize=14)
+        ax.set_ylabel('Mean SPEI {}'.format(which), fontsize=14)
+        ax.set_title('{} year running mean, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
+    ax.legend(loc='best')
     plt.tight_layout()
-    if show_plot:
-        plt.show()
     if save_plot:
         if output_tag is None:
             output_tag='default'
         plt.savefig(fname='{}yr_runmean-{}-{}_basin-{}-{}.png'.format(window_yrs, which, basin_names[basin_id], output_tag, date.today()))
+    if show_plot:
+        plt.show()
     
 
 def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_labels=True, show_plot=True, save_plot=False, output_tag=None):
@@ -70,25 +70,25 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
     basin_runavg_n = [np.convolve(permodel_dict[m]['NRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     colors_w = cm.get_cmap(cmaps[0])(np.linspace(0.2, 1, num=len(model_names)))
     colors_n = cm.get_cmap(cmaps[1])(np.linspace(0.2, 1, num=len(model_names)))
-    plt.figure('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]))
+    fig, ax = plt.subplots()
     plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
-        plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
-        plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_n[k], ls='-.', color=colors_n[k], linewidth=2.0)
-    plt.tick_params(axis='both', labelsize=12)
-    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
+        ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
+        ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_n[k], ls='-.', color=colors_n[k], linewidth=2.0)
+    ax.tick_params(axis='both', labelsize=12)
+    ax.set_xticks([1900,1950, 2000, 2050, 2100])
     if show_labels:
-        plt.axes().set_xlabel('Years', fontsize=14)
-        plt.axes().set_ylabel('SPEI', fontsize=14)
-        plt.title('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]), fontsize=16)
-    plt.legend(loc='best')
+        ax.set_xlabel('Years', fontsize=14)
+        ax.set_ylabel('SPEI', fontsize=14)
+        ax.set_title('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]), fontsize=16)
+    ax.legend(loc='best')
     plt.tight_layout()
-    if show_plot:
-        plt.show()
     if save_plot:
         if output_tag is None:
             output_tag='default'
         plt.savefig(fname='{}yr_runmean_comp-{}_basin-{}-{}.png'.format(window_yrs, basin_names[basin_id], output_tag, date.today()))
+    if show_plot:
+        plt.show()
 
 
 def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None):
@@ -113,24 +113,24 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
             
     colors = cm.get_cmap(cmaps)(np.linspace(0.2, 1, num=len(model_names)))
     styles = ('-',':')
-    plt.figure('{} year running variance by model, {} basin'.format(window_yrs, basin_names[basin_id]))
+    fig, ax = plt.subplots()
     plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
-        plt.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
-    plt.tick_params(axis='both', labelsize=12)
-    plt.axes().set_xticks([1900,1950, 2000, 2050, 2100])
+        ax.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
+    ax.tick_params(axis='both', labelsize=12)
+    ax.set_xticks([1900,1950, 2000, 2050, 2100])
     if show_labels:
-        plt.axes().set_xlabel('Years', fontsize=14)
-        plt.axes().set_ylabel('SPEI variance {}'.format(which), fontsize=14)
-        plt.title('{} year running variance by model, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
-    plt.legend(loc='best')
+        ax.set_xlabel('Years', fontsize=14)
+        ax.set_ylabel('SPEI variance {}'.format(which), fontsize=14)
+        ax.set_title('{} year running variance by model, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=16)
+    ax.legend(loc='best')
     plt.tight_layout()
-    if show_plot:
-        plt.show()
     if save_plot:
         if output_tag is None:
             output_tag='default'
         plt.savefig(fname='{}yr_runvar-{}-{}_basin-{}-{}.png'.format(window_yrs, which, basin_names[basin_id], output_tag, date.today()))
+    if show_plot:
+        plt.show()
 
     
 
