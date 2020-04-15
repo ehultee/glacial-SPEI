@@ -3,9 +3,7 @@
 ## Code: EHU | Data: SC
 
 import numpy as np
-#import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib import cm
 from gSPEI import *
 
 fpath = './data/SPEI_Files/'
@@ -35,16 +33,13 @@ for m in modelnames:
     SPEI_by_model[m]['diff'] = SPEI_by_model[m]['WRunoff'] - SPEI_by_model[m]['NRunoff']
 
 ## 30-yr running means and variance
-plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model)
-plot_basin_runmean(basin_id=1, permodel_dict=SPEI_by_model, which='NRunoff', cmap_name='Greys')
-plot_runmean_comparison(basin_id=1, permodel_dict=SPEI_by_model)
+for i in (1, 4, 26, -7): #plot the basins shown in manuscript main text
+    plot_runmean_comparison(basin_id=i, permodel_dict=SPEI_by_model)
+    plot_basin_runmean(basin_id=i, permodel_dict=SPEI_by_model)
+    plot_basin_runvar(basin_id=i, permodel_dict=SPEI_by_model)
 
-plot_basin_runvar(1, SPEI_by_model)
-plot_basin_runvar(4, SPEI_by_model)
-plot_basin_runvar(26, SPEI_by_model)
-plot_basin_runvar(-7, SPEI_by_model)
 
-# for i, b in enumerate(basin_names): #plot all
+# for i in range(len(basin_names)): #plot all
 #     plot_basin_runmean(basin_id=i, permodel_dict=SPEI_by_model, save_plot=True, show_plot=False)
 #     plot_basin_runvar(basin_id=i, permodel_dict=SPEI_by_model, save_plot=True, show_plot=False)
 
@@ -109,3 +104,22 @@ plt.axes().set_ylabel('Difference in SPEI variance', fontsize=16)
 plt.axes().set_ylim(-1.5, 1.0)
 plt.axes().set_xlim(-0.5, 5)
 plt.show()
+
+
+## Compare series with different SPEI integration times
+## --adding explicit comparison 15 Apr 2020 in response to reviewer comments
+SPEI_by_itime = {t: {} for t in integration_times} # create dictionary indexed by integration time
+for t in integration_times:
+    SPEI_by_itime[t] = {m: {} for m in modelnames} #nest dictionary by model name
+    for m in modelnames:
+        norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(t, m, scenarios[1])
+        wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(t, m, scenarios[1])
+        SPEI_by_itime[t][m]['NRunoff'] = np.loadtxt(norunoff_f_m)
+        SPEI_by_itime[t][m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
+        SPEI_by_itime[t][m]['diff'] = SPEI_by_itime[t][m]['WRunoff'] - SPEI_by_itime[t][m]['NRunoff']
+
+for t in integration_times:
+    plot_basin_runmean(basin_id=4, permodel_dict=SPEI_by_itime[t], show_plot=False, save_plot=True, output_tag='itime_{}mo'.format(t))
+    plot_basin_runmean(basin_id=26, permodel_dict=SPEI_by_itime[t], show_plot=False, save_plot=True, output_tag='itime_{}mo'.format(t))
+    plot_basin_runmean(basin_id=-7, permodel_dict=SPEI_by_itime[t], show_plot=False, save_plot=True, output_tag='itime_{}mo'.format(t))
+
