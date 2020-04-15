@@ -50,7 +50,7 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
         plt.savefig(fname='{}yr_runmean-{}-{}_basin-{}.png'.format(window_yrs, which, basin_names[basin_id], date.today()))
     
 
-def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_plot=True, save_plot=False):
+def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_labels=True, show_plot=True, save_plot=False):
     """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -70,6 +70,11 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
     for k,m in enumerate(model_names):
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
         plt.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_n[k], ls='-.', color=colors_n[k], linewidth=2.0)
+        plt.tick_params(axis='both', labelsize=12)
+    if show_labels:
+        plt.axes().set_xlabel('Years', fontsize=14)
+        plt.axes().set_ylabel('SPEI', fontsize=14)
+        plt.title('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]), fontsize=16)
     plt.legend(loc='best')
     plt.tight_layout()
     if show_plot:
