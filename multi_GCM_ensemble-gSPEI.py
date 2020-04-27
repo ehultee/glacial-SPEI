@@ -10,6 +10,7 @@ Created on Wed Apr 15 15:55:58 2020
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import gSPEI as gSPEI
 
 fpath = './data/SPEI_Files/'
@@ -52,13 +53,14 @@ rm_q1 = rm.quantile(q=0.25, axis=1)
 rm_q3 = rm.quantile(q=0.75, axis=1)
 single_models = [SPEI_by_basin['TARIM']['WRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
 
+colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
 fig, ax = plt.subplots()
 ax.plot(yrs, r, 'k', linewidth=3.0)
-ax.plot(yrs, rm_q1, 'b')
-ax.plot(yrs, rm_q3, 'b')
+ax.plot(yrs, rm_q1, 'k')
+ax.plot(yrs, rm_q3, 'k')
 for i in range(len(modelnames)):
-    ax.plot(yrs, single_models[i], 'r')
-ax.fill_between(yrs, rm_q1, rm_q3, color='b', alpha=0.2)
+    ax.plot(yrs, single_models[i], color=colors_w[i])
+ax.fill_between(yrs, rm_q1, rm_q3, color='k', alpha=0.2)
 ax.tick_params(axis='both', labelsize=12)
 ax.set_xticks([1900,1950, 2000, 2050, 2100])
 ax.set_xlabel('Years', fontsize=14)
