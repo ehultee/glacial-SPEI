@@ -29,7 +29,7 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 
 yrs = np.linspace(1900, 2101, num=2412)
 
-## Read all in to dict and create pandas DataFrame aggregated by basin
+## Read all in to dict by GCM as in other gSPEI scripts
 SPEI_by_model = {m: {} for m in modelnames} # create dictionary indexed by model name
 for m in modelnames:
     norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[1])
@@ -38,6 +38,7 @@ for m in modelnames:
     SPEI_by_model[m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
     SPEI_by_model[m]['diff'] = SPEI_by_model[m]['WRunoff'] - SPEI_by_model[m]['NRunoff']
 
+## Re-structure dictionary and create pandas DataFrames aggregated by basin
 SPEI_by_basin = {b: {} for b in basin_names} # create dictionary indexed by basin name
 for i, b in enumerate(basin_names):
     SPEI_by_basin[b] = {case: {} for case in cases}
