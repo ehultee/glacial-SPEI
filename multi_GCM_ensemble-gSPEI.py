@@ -47,14 +47,18 @@ q1 = gSPEI.basin_quartile(SPEI_by_basin, 'TARIM', 'WRunoff', q=0.25).rolling(win
 q2 = gSPEI.basin_quartile(SPEI_by_basin, 'TARIM', 'WRunoff', q=0.75).rolling(window=12*30).mean()
 
 ## Make example figure
-t = SPEI_by_basin['TARIM']['WRunoff']['CCSM4'].rolling(window=12*30).mean()
+rm = SPEI_by_basin['TARIM']['WRunoff'].rolling(window=12*30, axis=0).mean()
+rm_q1 = rm.quantile(q=0.25, axis=1)
+rm_q3 = rm.quantile(q=0.75, axis=1)
+single_models = [SPEI_by_basin['TARIM']['WRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
 
 fig, ax = plt.subplots()
 ax.plot(yrs, r, 'k', linewidth=3.0)
-ax.plot(yrs, q1, 'b')
-ax.plot(yrs, q2, 'b')
-ax.plot(yrs, t, 'r')
-ax.fill_between(yrs, q1, q2, color='b', alpha=0.2)
+ax.plot(yrs, rm_q1, 'b')
+ax.plot(yrs, rm_q3, 'b')
+for i in range(len(modelnames)):
+    ax.plot(yrs, single_models[i], 'r')
+ax.fill_between(yrs, rm_q1, rm_q3, color='b', alpha=0.2)
 ax.tick_params(axis='both', labelsize=12)
 ax.set_xticks([1900,1950, 2000, 2050, 2100])
 ax.set_xlabel('Years', fontsize=14)
