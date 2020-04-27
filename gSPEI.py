@@ -195,5 +195,79 @@ def glacial_vardiff(permodel_dict, years=(2070, 2100), return_range=True):
         return bas_glac_varmed
 
 
+## New functions to produce multi-GCM ensemble plots -- added 27 Apr 2020
+        
+def sort_models_to_basins(permodel_dict, cases_included=['NRunoff', 'WRunoff', 'diff']):
+    """Re-format a dictionary loaded in by GCM to be sorted by basin name first.
+    Facilitates multi-GCM ensemble estimates for each basin.
 
+    Parameters
+    ----------
+    permodel_dict : DICT
+        Stores SPEI per model, with the structure dict[modelname]['WRunoff'/'NRunoff'][basinname] = basin SPEI for this model and case
+    cases_included : LIST of STR
+        Names cases 'WRunoff' (with glacial runoff), 'NRunoff' (no glacial runoff), 'diff' (their difference) included in input/output
+        
+    Returns
+    -------
+    perbasin_dict: DICT
+        Stores SPEI per basin
+    """
+    cases = cases_included # inclusion of glacier runoff
+    
+    SPEI_by_basin = {b: {} for b in basin_names} # create dictionary indexed by basin name
+    for i, b in enumerate(basin_names):
+        SPEI_by_basin[b] = {case: {} for case in cases}
+        for case in cases:
+            tempdict = {}
+            for m in model_names:
+                tempdict[m] = permodel_dict[m][case][i] # pull data from SPEI_by_model into this new dict
+            SPEI_by_basin[b][case] = pd.DataFrame.from_dict(tempdict)
 
+    return SPEI_by_basin
+
+def basin_ensemble_mean(dict_by_basin, basin_name, case):
+    """Compute the multi-GCM ensemble mean SPEI for a given basin and case
+    
+    Parameters
+    ----------
+    dict_by_basin : DICT
+        Stores SPEI per basin
+    basin_name : STR
+        Which basin to study
+    case : STR
+        'WRunoff', 'NRunoff', 'diff'
+        
+    Returns
+    -------
+    em: pandas.Series object
+        Ensemble mean SPEI for this basin and case
+    
+    """
+    basin_df = dict_by_basin[basin_name][case]
+    em = basin_df.mean(axis=1) #compute mean among all models at each timestep
+    return em # a pandas Series object
+
+def basin_quartile(dict_by_basin, basin_name, case, q=0.25):
+    """Compute the multi-GCM ensemble first quartile for a given basin and case
+    
+    Parameters
+    ----------
+    dict_by_basin : DICT
+        Stores SPEI per basin
+    basin_name : STR
+        Which basin to study
+    case : STR
+        'WRunoff', 'NRunoff', 'diff'
+    q : FLOAT
+        Value between 0-1 indicating which quartile to compute. q=0.25 for first, 0.75 for third, etc.
+        
+    Returns
+    -------
+    em: pandas.Series object
+        First quartile SPEI for this basin and case
+    
+    """
+    basin_df = dict_by_basin[basin_name][case]
+    q1 = basin_df.quantile(q=q, axis=1)
+    return q1
