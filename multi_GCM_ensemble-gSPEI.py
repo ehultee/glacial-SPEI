@@ -43,24 +43,34 @@ for m in modelnames:
 SPEI_by_basin = gSPEI.sort_models_to_basins(SPEI_by_model)
 
 ## Compute multi-GCM ensemble means and quartiles
-r = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'WRunoff').rolling(window=12*30).mean()
-q1 = gSPEI.basin_quartile(SPEI_by_basin, 'TARIM', 'WRunoff', q=0.25).rolling(window=12*30).mean()
-q2 = gSPEI.basin_quartile(SPEI_by_basin, 'TARIM', 'WRunoff', q=0.75).rolling(window=12*30).mean()
-
-## Make example figure
+r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'WRunoff').rolling(window=12*30).mean()
+r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'NRunoff').rolling(window=12*30).mean()
 rm = SPEI_by_basin['TARIM']['WRunoff'].rolling(window=12*30, axis=0).mean()
 rm_q1 = rm.quantile(q=0.25, axis=1)
 rm_q3 = rm.quantile(q=0.75, axis=1)
-single_models = [SPEI_by_basin['TARIM']['WRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
+rm_n = SPEI_by_basin['TARIM']['NRunoff'].rolling(window=12*30, axis=0).mean()
+rm_q1_n = rm_n.quantile(q=0.25, axis=1)
+rm_q3_n = rm_n.quantile(q=0.75, axis=1)
+
+## Make example figure
+single_models_w = [SPEI_by_basin['TARIM']['WRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
+single_models_n = [SPEI_by_basin['TARIM']['NRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
+
 
 colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
+colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
 fig, ax = plt.subplots()
-ax.plot(yrs, r, 'k', linewidth=3.0)
+ax.plot(yrs, r_w, 'k', linewidth=3.0)
 ax.plot(yrs, rm_q1, 'k')
 ax.plot(yrs, rm_q3, 'k')
-for i in range(len(modelnames)):
-    ax.plot(yrs, single_models[i], color=colors_w[i])
-ax.fill_between(yrs, rm_q1, rm_q3, color='k', alpha=0.2)
+ax.plot(yrs, r_n, 'k', linewidth=3.0, ls=':')
+ax.plot(yrs, rm_q1_n, 'k', ls=':')
+ax.plot(yrs, rm_q3_n, 'k', ls=':')
+# for i in range(len(modelnames)):
+#     ax.plot(yrs, single_models_w[i], color=colors_w[i])
+#     ax.plot(yrs, single_models_n[i], color=colors_n[i])
+ax.fill_between(yrs, rm_q1, rm_q3, color='DarkBlue', alpha=0.2)
+ax.fill_between(yrs, rm_q1_n, rm_q3_n, color='DarkOrange', alpha=0.2)
 ax.tick_params(axis='both', labelsize=12)
 ax.set_xticks([1900,1950, 2000, 2050, 2100])
 ax.set_xlabel('Years', fontsize=14)
