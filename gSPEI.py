@@ -19,7 +19,7 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
 
-def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None):
+def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None, ax=None):
     """Make a plot of running mean difference in SPEI for a given basin, comparing across models.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -30,12 +30,14 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
         show_plot: Boolean, whether to show the resulting plot.  Default True
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
         output_tag: anything special to note in output filename, e.g. global settings applied. Default None will label 'default'
+        ax: Axes instance on which to plot.  Default None will set up a new instance
     """
     window_size = 12 * window_yrs # size of window given monthly data
     basin_runavg_bymodel = [np.convolve(permodel_dict[m][which][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     colors = cm.get_cmap(cmap_name)(np.linspace(0, 1, num=len(model_names)))
     styles = ('-',':')
-    fig, ax = plt.subplots()
+    if ax is None:    
+        fig, ax = plt.subplots() # create Axes instance if needed
     for k,m in enumerate(model_names):
         ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     ax.tick_params(axis='both', labelsize=14)
@@ -54,7 +56,7 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
         plt.show()
     
 
-def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_labels=True, show_plot=True, save_plot=False, output_tag=None):
+def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blues', 'Wistia'), show_labels=True, show_plot=True, save_plot=False, output_tag=None, ax=None):
     """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -64,13 +66,15 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
         show_plot: Boolean, whether to show the resulting plot.  Default True
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
         output_tag: anything special to note, e.g. global settings applied. Default None will label 'default'
+        ax: Axes instance on which to plot.  Default None will set up a new instance
     """
     window_size = 12 * window_yrs # size of window given monthly data
     basin_runavg_w = [np.convolve(permodel_dict[m]['WRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     basin_runavg_n = [np.convolve(permodel_dict[m]['NRunoff'][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
     colors_w = cm.get_cmap(cmaps[0])(np.linspace(0.2, 1, num=len(model_names)))
     colors_n = cm.get_cmap(cmaps[1])(np.linspace(0.2, 1, num=len(model_names)))
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
     plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
         ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
@@ -91,7 +95,7 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
         plt.show()
 
 
-def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None):
+def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None, ax=None):
     """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -101,6 +105,7 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
         show_plot: Boolean, whether to show the resulting plot.  Default True
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
         output_tag: anything special to note, e.g. global settings applied. Default None will label 'default'
+        ax: Axes instance on which to plot.  Default None will set up a new instance
     """
     basin_dict = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in model_names}
     varwindow = 12*window_yrs # number of months to window in rolling variance
@@ -113,7 +118,8 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
             
     colors = cm.get_cmap(cmaps)(np.linspace(0.2, 1, num=len(model_names)))
     styles = ('-',':')
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
     plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
         ax.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
