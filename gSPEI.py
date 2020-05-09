@@ -19,7 +19,10 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
 
-def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cmap_name='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None, ax=None):
+def plot_basin_runmean(basin_id, permodel_dict, 
+                       which='diff', window_yrs=30, cmap_name='viridis', 
+                       show_labels=True, show_plot=True, save_plot=False, 
+                       output_tag=None, ax=None, shade_axis=True):
     """Make a plot of running mean difference in SPEI for a given basin, comparing across models.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -31,6 +34,7 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
         output_tag: anything special to note in output filename, e.g. global settings applied. Default None will label 'default'
         ax: Axes instance on which to plot.  Default None will set up a new instance
+        shade_axis: Boolean, whether to shade regions for which the running window includes years before the glacier model switch-on
     """
     window_size = 12 * window_yrs # size of window given monthly data
     basin_runavg_bymodel = [np.convolve(permodel_dict[m][which][basin_id], np.ones((window_size,))/window_size, mode='valid') for m in model_names] #compute running means
@@ -38,10 +42,13 @@ def plot_basin_runmean(basin_id, permodel_dict, which='diff', window_yrs=30, cma
     styles = ('-',':')
     if ax is None:    
         fig, ax = plt.subplots() # create Axes instance if needed
+    if shade_axis:
+        cutoff_year = 1980 + window_yrs/2
+        ax.axvspan(1900, cutoff_year, color='Grey', alpha=0.3)
     for k,m in enumerate(model_names):
         ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_bymodel[k], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     ax.tick_params(axis='both', labelsize=14)
-    ax.set_xticks([1900,1950, 2000, 2050, 2100])
+    ax.set(xlim=(1900,2100), xticks=[1900,1950, 2000, 2050, 2100])
     if show_labels:
         ax.set_xlabel('Years', fontsize=16)
         ax.set_ylabel('Mean SPEI {}'.format(which), fontsize=16)
@@ -75,7 +82,7 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
     colors_n = cm.get_cmap(cmaps[1])(np.linspace(0.2, 1, num=len(model_names)))
     if ax is None:
         fig, ax = plt.subplots()
-    plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
+    ax.axhline(y=0, color='Gainsboro', linewidth=2.0)
     for k,m in enumerate(model_names):
         ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
         ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_n[k], ls='-.', color=colors_n[k], linewidth=2.0)
@@ -95,7 +102,7 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
         plt.show()
 
 
-def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None, ax=None):
+def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmaps='viridis', show_labels=True, show_plot=True, save_plot=False, output_tag=None, ax=None, shade_axis=True):
     """Make a plot comparing running-average model projections of SPEI with and without glacial runoff.
     Arguments:
         basin_id: integer, index of basin in the standard list "basin_names"
@@ -106,6 +113,7 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
         save_plot: Boolean, whether to save the plot in the working directory.  Default False
         output_tag: anything special to note, e.g. global settings applied. Default None will label 'default'
         ax: Axes instance on which to plot.  Default None will set up a new instance
+        shade_axis: Boolean, whether to shade regions for which the running window includes years before the glacier model switch-on
     """
     basin_dict = {m: {'NRunoff': [], 'WRunoff': [], 'diff': []} for m in model_names}
     varwindow = 12*window_yrs # number of months to window in rolling variance
@@ -120,7 +128,10 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
     styles = ('-',':')
     if ax is None:
         fig, ax = plt.subplots()
-    plt.axhline(y=0, color='Gainsboro', linewidth=2.0)
+    ax.axhline(y=0, color='Gainsboro', linewidth=2.0)
+    if shade_axis:
+        cutoff_year = 1980 + window_yrs/2
+        ax.axvspan(1900, cutoff_year, color='Grey', alpha=0.3)
     for k,m in enumerate(model_names):
         ax.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     ax.tick_params(axis='both', labelsize=14)
