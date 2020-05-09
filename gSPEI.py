@@ -53,7 +53,7 @@ def plot_basin_runmean(basin_id, permodel_dict,
         ax.set_xlabel('Years', fontsize=16)
         ax.set_ylabel('Mean SPEI {}'.format(which), fontsize=16)
         ax.set_title('{} year running mean, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=18)
-    ax.legend(loc='best')
+    # ax.legend(loc='best')
     plt.tight_layout()
     if save_plot:
         if output_tag is None:
@@ -140,7 +140,7 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
         ax.set_xlabel('Years', fontsize=16)
         ax.set_ylabel('SPEI variance {}'.format(which), fontsize=16)
         ax.set_title('{} year running variance by model, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=18)
-    ax.legend(loc='best')
+        ax.legend(loc='best')
     plt.tight_layout()
     if save_plot:
         if output_tag is None:
