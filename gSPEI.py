@@ -53,7 +53,7 @@ def plot_basin_runmean(basin_id, permodel_dict,
         ax.set_xlabel('Years', fontsize=16)
         ax.set_ylabel('Mean SPEI {}'.format(which), fontsize=16)
         ax.set_title('{} year running mean, {} case, {} basin'.format(window_yrs, which, basin_names[basin_id]), fontsize=18)
-    # ax.legend(loc='best')
+        ax.legend(loc='best')
     plt.tight_layout()
     if save_plot:
         if output_tag is None:
@@ -87,12 +87,12 @@ def plot_runmean_comparison(basin_id, permodel_dict, window_yrs=30, cmaps=('Blue
         ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_w[k], label=m, color=colors_w[k], linewidth=2.0)
         ax.plot(yrs[(window_size/2):-(window_size/2 -1)], basin_runavg_n[k], ls='-.', color=colors_n[k], linewidth=2.0)
     ax.tick_params(axis='both', labelsize=14)
-    ax.set_xticks([1900,1950, 2000, 2050, 2100])
+    ax.set(xlim=(1900,2100), xticks=[1900,1950, 2000, 2050, 2100])
     if show_labels:
         ax.set_xlabel('Years', fontsize=16)
         ax.set_ylabel('SPEI', fontsize=16)
         ax.set_title('{} year running average trajectories, {} basin'.format(window_yrs, basin_names[basin_id]), fontsize=18)
-    ax.legend(loc='best')
+        ax.legend(loc='best')
     plt.tight_layout()
     if save_plot:
         if output_tag is None:
@@ -135,7 +135,7 @@ def plot_basin_runvar(basin_id, permodel_dict, which='diff', window_yrs=30, cmap
     for k,m in enumerate(model_names):
         ax.plot(yrs, basin_dict[m][which], label=m, color=colors[k], ls=styles[np.mod(k, len(styles))], linewidth=2.0)
     ax.tick_params(axis='both', labelsize=14)
-    ax.set_xticks([1900,1950, 2000, 2050, 2100])
+    ax.set(xlim=(1900,2100), xticks=[1900,1950, 2000, 2050, 2100])
     if show_labels:
         ax.set_xlabel('Years', fontsize=16)
         ax.set_ylabel('SPEI variance {}'.format(which), fontsize=16)
