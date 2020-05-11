@@ -318,8 +318,8 @@ def ensemble_glacial_meandiff(dict_by_basin, years=(2070, 2100), return_range=Tr
     for i in range(len(basin_names)):
         # Compute difference in 30-year mean of ensemble with/without glacial runoff
         basin_30yrmeandiff = basin_ensemble_mean(dict_by_basin, basin_names[i], 'WRunoff')[idx_i:idx_f].mean() - basin_ensemble_mean(dict_by_basin, basin_names[i], 'NRunoff')[idx_i:idx_f].mean()
-        basin_30yrQ1 = np.nanmean(basin_quartile(dict_by_basin, basin_names[i], 'WRunoff', q=0.25)[idx_i:idx_f] - basin_quartile(dict_by_basin, basin_names[i], 'NRunoff', q=0.25)[idx_i:idx_f])
-        basin_30yrQ3 = np.nanmean(basin_quartile(dict_by_basin, basin_names[i], 'WRunoff', q=0.75)[idx_i:idx_f] - basin_quartile(dict_by_basin, basin_names[i], 'NRunoff', q=0.75)[idx_i:idx_f])
+        basin_30yrQ1 = (dict_by_basin[basin_names[i]]['WRunoff'][idx_i:idx_f].mean() - dict_by_basin[basin_names[i]]['NRunoff'][idx_i:idx_f].mean()).quantile(q=0.25)
+        basin_30yrQ3 = (dict_by_basin[basin_names[i]]['WRunoff'][idx_i:idx_f].mean() - dict_by_basin[basin_names[i]]['NRunoff'][idx_i:idx_f].mean()).quantile(q=0.75)
         bas_ens_diff.append(basin_30yrmeandiff)
         bas_ens_low.append(basin_30yrmeandiff - basin_30yrQ1)
         bas_ens_high.append(basin_30yrQ3 - basin_30yrmeandiff)
