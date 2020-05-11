@@ -75,3 +75,16 @@ ax.tick_params(axis='both', labelsize=12)
 ax.set_xticks([1900,1950, 2000, 2050, 2100])
 ax.set_xlabel('Years', fontsize=14)
 ax.set_ylabel('Rolling mean SPEI', fontsize=14)
+
+
+## Calculate changes due to glacial effect at end of century, using ensemble approach
+bas_glac_meandiff, quantile_spread = gSPEI.ensemble_glacial_meandiff(SPEI_by_basin)
+bas_glac_vardiff, var_spread = gSPEI.ensemble_glacial_vardiff(SPEI_by_basin)
+
+plt.figure('Mean and variance shifts due to glacial effects in 2070-2100')
+plt.errorbar(x=bas_glac_meanmed, y=bas_glac_varmed, xerr=mean_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
+plt.axes().set_xlabel('Difference in mean SPEI', fontsize=16)
+plt.axes().set_ylabel('Difference in SPEI variance', fontsize=16)
+plt.axes().set_ylim(-1.5, 1.0)
+plt.axes().set_xlim(-0.5, 5)
+plt.show()

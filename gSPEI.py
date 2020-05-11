@@ -288,3 +288,85 @@ def basin_quartile(dict_by_basin, basin_name, case, q=0.25):
     basin_df = dict_by_basin[basin_name][case]
     q1 = basin_df.quantile(q=q, axis=1)
     return q1
+
+def ensemble_glacial_meandiff(dict_by_basin, years=(2070, 2100), return_range=True):
+    """Calculate the ensemble mean & IQR difference in 30-yr mean SPEI with vs. without runoff
+
+    Parameters
+    ----------
+    dict_by_basin : DICT
+        Stores SPEI per basin
+    years : TUPLE, optional
+        Start and end years of scenario to examine. The default is (2070, 2100).
+    return_range : BOOLEAN, optional
+        Whether to return ensemble interquartile range. The default is True.
+
+    Returns
+    -------
+    bas_ens_mean : ARRAY
+        Mean over the selected period of multi-GCM ensemble mean(WRunoff-NRunoff)
+    bas_ens_IQR : ARRAY (2, N)
+        Multi-GCM IQR in mean difference, expressed as 2xN array of (mean -Q1, Q3-mean) for errorbar plotting
+
+    """
+    
+    idx_i, idx_f = 12*np.array((years[0]-1900, years[1]-1899)) #add 12 months to last year so that calculation goes for all 12 months
+    bas_ens_diff = []
+    bas_ens_low = []
+    bas_ens_high = []
+    
+    for i in range(len(basin_names)):
+        # Compute difference in 30-year mean of ensemble with/without glacial runoff
+        basin_30yrmeandiff = basin_ensemble_mean(dict_by_basin, basin_names[i], 'WRunoff')[idx_i:idx_f].mean() - basin_ensemble_mean(dict_by_basin, basin_names[i], 'NRunoff')[idx_i:idx_f].mean()
+        basin_30yrQ1 = np.nanmean(basin_quartile(dict_by_basin, basin_names[i], 'WRunoff', q=0.25)[idx_i:idx_f] - basin_quartile(dict_by_basin, basin_names[i], 'NRunoff', q=0.25)[idx_i:idx_f])
+        basin_30yrQ3 = np.nanmean(basin_quartile(dict_by_basin, basin_names[i], 'WRunoff', q=0.75)[idx_i:idx_f] - basin_quartile(dict_by_basin, basin_names[i], 'NRunoff', q=0.75)[idx_i:idx_f])
+        bas_ens_diff.append(basin_30yrmeandiff)
+        bas_ens_low.append(basin_30yrmeandiff - basin_30yrQ1)
+        bas_ens_high.append(basin_30yrQ3 - basin_30yrmeandiff)
+
+    bas_ens_IQR = np.stack((bas_ens_low, bas_ens_high))
+    
+    if return_range:
+        return bas_ens_diff, bas_ens_IQR
+    else:
+        return bas_ens_diff
+
+def ensemble_glacial_vardiff(dict_by_basin, years=(2070, 2100), return_range=True):
+    """Calculate the ensemble mean difference in 30-yr SPEI variance with vs. without runoff
+
+    Parameters
+    ----------
+    dict_by_basin : DICT
+        Stores SPEI per basin
+    years : TUPLE, optional
+        Start and end years of scenario to examine. The default is (2070, 2100).
+    return_range : BOOLEAN, optional
+        Whether to return ensemble interquartile range. The default is True.
+
+    Returns
+    -------
+    bas_ens_var : ARRAY
+        Multi-GCM ensemble difference in var(WRunoff)-var(NRunoff)
+    bas_ens_IQR : ARRAY (2, N)
+        Multi-GCM IQR in mean difference, expressed as 2xN array of (mean -Q1, Q3-mean) for errorbar plotting
+
+    """
+    idx_i, idx_f = 12*np.array((years[0]-1900, years[1]-1899)) #add 12 months to last year so that calculation goes for all 12 months
+    bas_mean_vardiff = []
+    bas_vardiff_low = []
+    bas_vardiff_high = []
+    
+    for i in range(len(basin_names)):
+        bvar_n = dict_by_basin[basin_names[i]]['NRunoff'][idx_i:idx_f].var() # using pandas function, tagged by model
+        bvar_g = dict_by_basin[basin_names[i]]['WRunoff'][idx_i:idx_f].var()
+        basin_glacial_varshift = bvar_g - bvar_n
+        bas_mean_vardiff.append(basin_glacial_varshift.mean())
+        bas_vardiff_low.append(basin_glacial_varshift.mean() - basin_glacial_varshift.quantile(q=0.25))
+        bas_vardiff_high.append(basin_glacial_varshift.quantile(q=0.75) - basin_glacial_varshift.mean())
+        
+    var_spread = np.stack((bas_vardiff_low, bas_vardiff_high))
+
+    if return_range:
+        return bas_mean_vardiff, var_spread
+    else:
+        return bas_mean_vardiff
