@@ -13,7 +13,7 @@ import pandas as pd
 import gSPEI as gSPEI
 
 fpath_default = './data/SPEI_Files/'
-fpath_conduct = '/Users/lizz/Desktop/SPEI_Conduct/'
+fpath_conduct = './data/SPEI_Files/variable_stom_conduct'
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used
