@@ -42,17 +42,19 @@ for i in (1, 4, 26, -7): #plot the basins shown in manuscript main text
 #     plot_basin_runmean(basin_id=i, permodel_dict=SPEI_by_model, save_plot=True, show_plot=False)
 #     plot_basin_runvar(basin_id=i, permodel_dict=SPEI_by_model, save_plot=True, show_plot=False)
 
-# ## Calculate changes due to glacial effect at end of century, using gSPEI functions
-# bas_glac_meanmed, mean_spread = glacial_meandiff(SPEI_by_model)
-# bas_glac_varmed, var_spread = glacial_vardiff(SPEI_by_model)
+## Calculate changes due to glacial effect at end of century, using gSPEI functions
+bas_glac_meanmed, mean_spread = glacial_meandiff(SPEI_by_model)
+bas_glac_varmed, var_spread = glacial_vardiff(SPEI_by_model)
 
-# plt.figure('Mean and variance shifts due to glacial effects in 2070-2100')
-# plt.errorbar(x=bas_glac_meanmed, y=bas_glac_varmed, xerr=mean_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
-# plt.axes().set_xlabel('Difference in mean SPEI', fontsize=16)
-# plt.axes().set_ylabel('Difference in SPEI variance', fontsize=16)
-# plt.axes().set_ylim(-1.5, 1.0)
-# plt.axes().set_xlim(-0.5, 5)
-# plt.show()
+fig, ax = plt.subplots(1)
+ax.axhline(y=0, ls=':', color='Grey', alpha=0.5)
+ax.axvline(x=0, ls=':', color='Grey', alpha=0.5)
+ax.errorbar(x=bas_glac_meanmed, y=bas_glac_varmed, xerr=mean_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
+ax.set_xlabel('Difference in mean SPEI', fontsize=16)
+ax.set_ylabel('Difference in SPEI variance', fontsize=16)
+ax.set(ylim=(-1.5, 1.0), xlim=(-0.5, 5))
+plt.show()
+
 
 
 # ## Compare series with different SPEI integration times
