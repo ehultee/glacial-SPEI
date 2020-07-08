@@ -85,6 +85,8 @@ bas_glac_meanmed, mean_spread_full = gSPEI.glacial_meandiff(SPEI_by_model)
 bas_glac_varmed, var_spread_full = gSPEI.glacial_vardiff(SPEI_by_model)
 
 fig1, ax1 = plt.subplots(figsize=(5,4))
+ax1.axhline(y=0, ls=':', color='Grey', alpha=0.5)
+ax1.axvline(x=0, ls=':', color='Grey', alpha=0.5)
 ax1.errorbar(x=bas_glac_meandiff, y=bas_glac_vardiff, xerr=quantile_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
 ax1.errorbar(x=bas_glac_meandiff, y=bas_glac_vardiff, xerr=mean_spread_full, yerr=var_spread_full, ls='', marker='d', elinewidth=1.0, color='DarkBlue', alpha=0.5) #extend whiskers to full range
 ax1.set_xlabel('Difference in mean SPEI', fontsize=16)
