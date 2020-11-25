@@ -10,6 +10,8 @@ Created on Mon Jun 29 13:29:01 2020
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+# import sys
+# sys.path.insert(0, 'Users/lizz/Documents/GitHub/glacial-SPEI')
 import gSPEI as gSPEI
 
 fpath_default = './data/SPEI_Files/'
