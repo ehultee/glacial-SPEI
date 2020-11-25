@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import gSPEI as gSPEI
 
 # make nice figures for publication with subplots
+SPEI_by_model = SPEI_by_model_C
 
 ## Figure 1: 4 basins with/without runoff
 fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, figsize=(10,6))
