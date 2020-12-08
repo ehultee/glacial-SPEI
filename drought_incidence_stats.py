@@ -67,7 +67,7 @@ def find_droughts(series, threshold=0):
         else:
             if i==0:
                 current_drought = [] #create new for start of time
-            elif series[i-1]>=threshold:
+            elif (series[i-1]>=threshold or np.isnan(series[i-1])):
                 current_drought = [] #create new for start of drought
             current_drought.append(v)
             if i==len(series)-1:
@@ -76,6 +76,31 @@ def find_droughts(series, threshold=0):
                 droughts[i] = current_drought #write it out if drought ending
     return droughts
     
+
+keys_w_bymodel = {m: [] for m in modelnames}
+keys_n_bymodel = {m: [] for m in modelnames}
+drt_dur_w_bymodel = {m: [] for m in modelnames}
+drt_dur_n_bymodel = {m: [] for m in modelnames}
+drt_sev_w_bymodel = {m: [] for m in modelnames}
+drt_sev_n_bymodel = {m: [] for m in modelnames}
+
+for m in modelnames:
+    print(m)
+    ser_w = SPEI_by_basin['TARIM']['WRunoff'][m]
+    ser_n = SPEI_by_basin['TARIM']['NRunoff'][m]
+    droughts_w = find_droughts(ser_w, threshold=0)
+    droughts_n = find_droughts(ser_n, threshold=0)
+    drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
+    drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n if k>=960})
+    
+    keys_w_bymodel[m] = drts_w_trimmed.keys()
+    keys_n_bymodel[m] = drts_n_trimmed.keys()
+    drt_dur_w_bymodel[m] = [len(droughts_w[k]) for k in drts_w_trimmed.keys()]
+    drt_dur_n_bymodel[m] = [len(droughts_n[k]) for k in drts_n_trimmed.keys()]
+    drt_sev_w_bymodel[m] = [sum(droughts_w[k]) for k in drts_w_trimmed.keys()]
+    drt_sev_n_bymodel[m] = [sum(droughts_n[k]) for k in drts_n_trimmed.keys()]
+
+## find ensemble versions
 droughts_w = find_droughts(r_w, threshold=0)
 droughts_n = find_droughts(r_n, threshold=0)
 drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
@@ -86,8 +111,10 @@ drt_dur_n = [len(droughts_n[k]) for k in drts_n_trimmed.keys()]
 drt_sev_w = [sum(droughts_w[k]) for k in drts_w_trimmed.keys()]
 drt_sev_n = [sum(droughts_n[k]) for k in drts_n_trimmed.keys()]
 
-
 fig1, ax1 = plt.subplots()
+for m in modelnames:
+    ax1.scatter(yrs[keys_w_bymodel[m]], drt_dur_w_bymodel[m], color='DarkBlue', alpha=0.3)
+    ax1.scatter(yrs[keys_n_bymodel[m]], drt_dur_n_bymodel[m], color='Orange', alpha=0.3)
 ax1.scatter(yrs[drts_w_trimmed.keys()], drt_dur_w, color='DarkBlue', alpha=0.8, label='WRunoff')
 ax1.scatter(yrs[drts_n_trimmed.keys()], drt_dur_n, color='Orange', alpha=0.8, label='NRunoff')
 ax1.set(xlim=(1980, 2100), xlabel=('Year'), ylabel=('Drought duration [mo]'))
@@ -95,6 +122,9 @@ ax1.legend(loc='best')
 plt.show()
 
 fig2, ax2 = plt.subplots()
+for m in modelnames:
+    ax2.scatter(yrs[keys_w_bymodel[m]], drt_sev_w_bymodel[m], color='DarkBlue', alpha=0.3)
+    ax2.scatter(yrs[keys_n_bymodel[m]], drt_sev_n_bymodel[m], color='Orange', alpha=0.3)
 ax2.scatter(yrs[drts_w_trimmed.keys()], drt_sev_w, color='DarkBlue', alpha=0.8, label='WRunoff')
 ax2.scatter(yrs[drts_n_trimmed.keys()], drt_sev_n, color='Orange', alpha=0.8, label='NRunoff')
 ax2.set(xlim=(1980, 2100), xlabel=('Year'), ylabel=('Accumulated SPEI deficit'))
