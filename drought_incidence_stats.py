@@ -85,7 +85,6 @@ drt_sev_w_bymodel = {m: [] for m in modelnames}
 drt_sev_n_bymodel = {m: [] for m in modelnames}
 
 for m in modelnames:
-    print(m)
     ser_w = SPEI_by_basin['TARIM']['WRunoff'][m]
     ser_n = SPEI_by_basin['TARIM']['NRunoff'][m]
     droughts_w = find_droughts(ser_w, threshold=0)
@@ -110,6 +109,17 @@ drt_dur_w = [len(droughts_w[k]) for k in drts_w_trimmed.keys()]
 drt_dur_n = [len(droughts_n[k]) for k in drts_n_trimmed.keys()]
 drt_sev_w = [sum(droughts_w[k]) for k in drts_w_trimmed.keys()]
 drt_sev_n = [sum(droughts_n[k]) for k in drts_n_trimmed.keys()]
+
+## Report statistics
+print('Mean number of droughts over the period is {} with runoff, {} without'.format(
+    np.mean([len(keys_w_bymodel[m]) for m in modelnames]),
+    np.mean([len(keys_n_bymodel[m]) for m in modelnames])))
+print('Mean drought duration is {} with runoff, {} without'.format(
+    np.mean([np.mean(drt_dur_w_bymodel[m]) for m in modelnames]),
+    np.mean([np.mean(drt_dur_n_bymodel[m]) for m in modelnames])))
+print('Mean SPEI deficit per drought is {} with runoff, {} without'.format(
+    np.mean([np.mean(drt_sev_w_bymodel[m]) for m in modelnames]),
+    np.mean([np.mean(drt_sev_n_bymodel[m]) for m in modelnames])))
 
 fig1, ax1 = plt.subplots()
 for m in modelnames:
