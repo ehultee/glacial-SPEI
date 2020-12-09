@@ -44,7 +44,7 @@ SPEI_by_basin = gSPEI.sort_models_to_basins(SPEI_by_model_C)
 r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'WRunoff')
 r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'NRunoff')
 
-def find_droughts(series, threshold=0):
+def find_droughts(series, threshold=-1):
     """Identify droughts in a timeseries of SPEI
 
     Parameters
@@ -52,7 +52,8 @@ def find_droughts(series, threshold=0):
     series : pandas Series
         SPEI time series.
     threshold : float, optional
-        Cutoff value, below which we define a drought. The default is 0.
+        Cutoff value that must be reached for negative SPEI to be called
+        a 'drought'. The default is -1.
 
     Returns
     -------
@@ -62,19 +63,22 @@ def find_droughts(series, threshold=0):
     """
     droughts = collections.OrderedDict()
     for i,v in enumerate(series):
-        if (v>=threshold or np.isnan(v)): 
+        if (v>=0 or np.isnan(v)): 
             pass
         else:
             if i==0:
                 current_drought = [] #create new for start of time
-            elif (series[i-1]>=threshold or np.isnan(series[i-1])):
+            elif (series[i-1]>=0 or np.isnan(series[i-1])):
                 current_drought = [] #create new for start of drought
             current_drought.append(v)
             if i==len(series)-1:
                 droughts[i] = current_drought #write it out if time ending
-            elif series[i+1]>=threshold:
+            elif series[i+1]>=0:
                 droughts[i] = current_drought #write it out if drought ending
-    return droughts
+    droughts_thresholded = collections.OrderedDict(
+        {k: droughts[k] for k in droughts.keys() if sum(
+            np.less_equal(droughts[k], threshold))>0})
+    return droughts_thresholded
     
 
 keys_w_bymodel = {m: [] for m in modelnames}
@@ -87,10 +91,10 @@ drt_sev_n_bymodel = {m: [] for m in modelnames}
 for m in modelnames:
     ser_w = SPEI_by_basin['TARIM']['WRunoff'][m]
     ser_n = SPEI_by_basin['TARIM']['NRunoff'][m]
-    droughts_w = find_droughts(ser_w, threshold=0)
-    droughts_n = find_droughts(ser_n, threshold=0)
-    drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
-    drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n if k>=960})
+    droughts_w = find_droughts(ser_w, threshold=-1)
+    droughts_n = find_droughts(ser_n, threshold=-1)
+    drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w.keys() if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
+    drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n.keys() if k>=960})
     
     keys_w_bymodel[m] = drts_w_trimmed.keys()
     keys_n_bymodel[m] = drts_n_trimmed.keys()
@@ -100,10 +104,10 @@ for m in modelnames:
     drt_sev_n_bymodel[m] = [sum(droughts_n[k]) for k in drts_n_trimmed.keys()]
 
 ## find ensemble versions
-droughts_w = find_droughts(r_w, threshold=0)
-droughts_n = find_droughts(r_n, threshold=0)
-drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
-drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n if k>=960})
+droughts_w = find_droughts(r_w, threshold=-1)
+droughts_n = find_droughts(r_n, threshold=-1)
+drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w.keys() if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
+drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n.keys() if k>=960})
 
 drt_dur_w = [len(droughts_w[k]) for k in drts_w_trimmed.keys()]
 drt_dur_n = [len(droughts_n[k]) for k in drts_n_trimmed.keys()]
