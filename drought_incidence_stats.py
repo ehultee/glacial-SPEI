@@ -14,7 +14,7 @@ import pandas as pd
 import gSPEI as gSPEI
 import collections
 
-fpath_conduct = './data/SPEI_Files/variable_stom_conduct/'
+fpath_conduct = './data/SPEI_Files/nonparametric-var_stom_c/'
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used
@@ -91,8 +91,8 @@ drt_sev_n_bymodel = {m: [] for m in modelnames}
 for m in modelnames:
     ser_w = SPEI_by_basin['TARIM']['WRunoff'][m]
     ser_n = SPEI_by_basin['TARIM']['NRunoff'][m]
-    droughts_w = find_droughts(ser_w, threshold=-1)
-    droughts_n = find_droughts(ser_n, threshold=-1)
+    droughts_w = find_droughts(ser_w, threshold=0)
+    droughts_n = find_droughts(ser_n, threshold=0)
     drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w.keys() if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
     drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n.keys() if k>=960})
     
@@ -104,8 +104,8 @@ for m in modelnames:
     drt_sev_n_bymodel[m] = [sum(droughts_n[k]) for k in drts_n_trimmed.keys()]
 
 ## find ensemble versions
-droughts_w = find_droughts(r_w, threshold=-1)
-droughts_n = find_droughts(r_n, threshold=-1)
+droughts_w = find_droughts(r_w, threshold=0)
+droughts_n = find_droughts(r_n, threshold=0)
 drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w.keys() if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
 drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n.keys() if k>=960})
 
