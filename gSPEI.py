@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from datetime import date
+import collections
 
 ## Constants associated with this analysis
 yrs = np.linspace(1900, 2101, num=2412)
@@ -370,3 +371,115 @@ def ensemble_glacial_vardiff(dict_by_basin, years=(2070, 2100), return_range=Tru
         return bas_mean_vardiff, var_spread
     else:
         return bas_mean_vardiff
+
+def find_droughts(series, threshold=-1, period=(1980, 2100), t_array=yrs):
+    """Identify droughts in a timeseries of SPEI
+
+    Parameters
+    ----------
+    series : pandas Series
+        SPEI time series.
+    threshold : float, optional
+        Cutoff value that must be reached for negative SPEI to be called
+        a 'drought'. The default is -1.
+    period : tuple, optional
+        Start and end years between which to compute stats.  Default is (1980,2100).
+    t_array : array, optional
+        Array of decimal years corresponding to SPEI timeseries.  
+        Default is yrs = np.linspace(1900, 2101, num=2412)
+
+    Returns
+    -------
+    droughts : OrderedDict
+        SPEI values sorted into droughts, with dict keys the indices in yrs of drought onset.
+
+    """
+    start_idx = np.argwhere(t_array >= period[0])[0]
+    end_idx = np.argwhere(t_array <= period[1])[-1]
+    
+    droughts = collections.OrderedDict()
+    for i,v in enumerate(series):
+        if (v>=0 or np.isnan(v)): 
+            pass
+        else:
+            if i==0:
+                current_drought = [] #create new for start of time
+            elif (series[i-1]>=0 or np.isnan(series[i-1])):
+                current_drought = [] #create new for start of drought
+            current_drought.append(v)
+            if i==len(series)-1:
+                droughts[i] = current_drought #write it out if time ending
+            elif series[i+1]>=0:
+                droughts[i] = current_drought #write it out if drought ending
+    droughts_thresholded = collections.OrderedDict(
+        {k: droughts[k] for k in droughts.keys() if sum(
+            np.less_equal(droughts[k], threshold))>0})
+    droughts_trimmed_0 = collections.OrderedDict({k: droughts_thresholded[k] 
+                                                  for k in droughts_thresholded.keys() if k>=start_idx})
+    droughts_trimmed = collections.OrderedDict({k: droughts_trimmed_0[k] 
+                                                  for k in droughts_trimmed_0.keys() if k<end_idx}) #not inclusive here
+    return droughts_trimmed
+
+def basin_summary_stats(SPEI_dict, basin_name, modelnames, threshold=-1, 
+                        period=(1980,2100), t_array=yrs):
+    """Find droughts in all models for a given basin, and report incidence,
+    duration, and severity for with/without glacial runoff cases.
+    
+
+    Parameters
+    ----------
+    SPEI_dict : dictionary
+        SPEI values with keys [<basin>][<scenario>][<model>].
+    basin_name: str
+        name of basin 
+    modelnames : list
+        names of GCMs used.
+    threshold : float, optional
+        SPEI value that must be reached to define a drought. The default is -1.
+    period : tuple, optional
+        Start and end years between which to compute stats.  Default is (1980,2100).
+    t_array : array, optional
+        Array of decimal years corresponding to SPEI timeseries.  
+        Default is yrs = np.linspace(1900, 2101, num=2412)
+    
+    Returns
+    -------
+    [(mean_drtnumber_w, mean_drtnumber_n), (mean_drtdur_w, mean_drtdur_n), 
+    (mean_drtsev_w, mean_drtsev_n)]
+        Drought incidence, duration, and severity pairs for this basin in the given period.
+
+    """
+    
+    keys_w_bymodel = {m: [] for m in modelnames}
+    keys_n_bymodel = {m: [] for m in modelnames}
+    drt_dur_w_bymodel = {m: [] for m in modelnames}
+    drt_dur_n_bymodel = {m: [] for m in modelnames}
+    drt_sev_w_bymodel = {m: [] for m in modelnames}
+    drt_sev_n_bymodel = {m: [] for m in modelnames}
+    
+    for m in modelnames:
+        ser_w = SPEI_dict[basin_name]['WRunoff'][m]
+        ser_n = SPEI_dict[basin_name]['NRunoff'][m]
+        droughts_w = find_droughts(ser_w, threshold=threshold, period=period, t_array=t_array)
+        droughts_n = find_droughts(ser_n, threshold=threshold, period=period, t_array=t_array)
+        # drts_w_trimmed = collections.OrderedDict({k: droughts_w[k] for k in droughts_w.keys() if k>=960}) #960 is first index where yrs > 1980 (glacier model on)
+        # drts_n_trimmed = collections.OrderedDict({k: droughts_n[k] for k in droughts_n.keys() if k>=960})
+        drts_w_trimmed = droughts_w
+        drts_n_trimmed = droughts_n
+        
+        keys_w_bymodel[m] = drts_w_trimmed.keys()
+        keys_n_bymodel[m] = drts_n_trimmed.keys()
+        drt_dur_w_bymodel[m] = [len(droughts_w[k]) for k in drts_w_trimmed.keys()]
+        drt_dur_n_bymodel[m] = [len(droughts_n[k]) for k in drts_n_trimmed.keys()]
+        drt_sev_w_bymodel[m] = [sum(droughts_w[k]) for k in drts_w_trimmed.keys()]
+        drt_sev_n_bymodel[m] = [sum(droughts_n[k]) for k in drts_n_trimmed.keys()]
+    
+    ## Report statistics
+    mean_drtnumber_w = np.nanmean([len(keys_w_bymodel[m]) for m in modelnames])
+    mean_drtnumber_n = np.nanmean([len(keys_n_bymodel[m]) for m in modelnames])
+    mean_drtdur_w = np.nanmean([np.mean(drt_dur_w_bymodel[m]) for m in modelnames])
+    mean_drtdur_n = np.nanmean([np.mean(drt_dur_n_bymodel[m]) for m in modelnames])
+    mean_drtsev_w = np.nanmean([np.mean(drt_sev_w_bymodel[m]) for m in modelnames])
+    mean_drtsev_n = np.nanmean([np.mean(drt_sev_n_bymodel[m]) for m in modelnames])
+    
+    return [(mean_drtnumber_w, mean_drtnumber_n), (mean_drtdur_w, mean_drtdur_n), (mean_drtsev_w, mean_drtsev_n)]
