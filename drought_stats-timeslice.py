@@ -1,12 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Compare drought buffering effect compared with basin stats
-
-Created on Thu Dec 10 15:39:17 2020
+Time slice drought stats
+Created on Thu Jan 14 14:04:09 2021
 
 @author: lizz
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 import gSPEI as gSPEI
@@ -56,37 +56,50 @@ SPEI_by_basin = gSPEI.sort_models_to_basins(SPEI_by_model_C)
 r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'WRunoff')
 r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'NRunoff')
 
-
-basin_stats = {b: gSPEI.basin_summary_stats(SPEI_by_basin, basin_name=b, modelnames=modelnames) for b in basin_names}
-
-## plot by basin initial glacial area
-fig, (ax1,ax2,ax3) = plt.subplots(1,3)
-for b, a in zip(basin_names, basin_glacier_area):
-    ax1.scatter(a, basin_stats[b][0][0], color='DarkBlue')
-    ax1.scatter(a, basin_stats[b][0][1], color='Orange')
-    ax2.scatter(a, basin_stats[b][1][0], color='DarkBlue')
-    ax2.scatter(a, basin_stats[b][1][1], color='Orange')
-    ax3.scatter(a, basin_stats[b][2][0], color='DarkBlue')
-    ax3.scatter(a, basin_stats[b][2][1], color='Orange')
-ax1.set(xlabel='Basin glacier area [km2]', ylabel='Mean number of droughts 1980-2100', xscale='log')
-ax2.set(xlabel='Basin glacier area [km2]', ylabel='Mean drought duration 1980-2100', xscale='log')
-ax3.set(xlabel='Basin glacier area [km2]', ylabel='Mean drought severity 1980-2100', xscale='log')
-plt.show()
+basin_stats_hist = {b: gSPEI.basin_summary_stats(SPEI_by_basin, basin_name=b, modelnames=modelnames, period=(1980,2010)) for b in basin_names}
+basin_stats_midC = {b: gSPEI.basin_summary_stats(SPEI_by_basin, basin_name=b, modelnames=modelnames, period=(2030,2060)) for b in basin_names}
+basin_stats_endC = {b: gSPEI.basin_summary_stats(SPEI_by_basin, basin_name=b, modelnames=modelnames, period=(2070,2100)) for b in basin_names}
 
 
-fig2, (ax4,ax5,ax6) = plt.subplots(1,3)
+## Drought number over time
+fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
 for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     pg = ag/a # percent glaciated
-    # ax4.scatter(pg, basin_stats[b][0][0], color='DarkBlue')
-    # ax4.scatter(pg, basin_stats[b][0][1], color='Orange')
-    ax4.scatter(pg, basin_stats[b][0][1]-basin_stats[b][0][0], color='k')
-    # ax5.scatter(pg, basin_stats[b][1][0], color='DarkBlue')
-    # ax5.scatter(pg, basin_stats[b][1][1], color='Orange')
-    ax5.scatter(pg, basin_stats[b][1][1]-basin_stats[b][1][0], color='k')
-    # ax6.scatter(pg, basin_stats[b][2][0], color='DarkBlue')
-    # ax6.scatter(pg, basin_stats[b][2][1], color='Orange')
-    ax6.scatter(pg, basin_stats[b][2][1]-basin_stats[b][2][0], color='k')
-ax4.set(xlabel='Glacier area fraction', ylabel='Mean number of droughts 1980-2100')
-ax5.set(xlabel='Glacier area fraction', ylabel='Mean drought duration 1980-2100')
-ax6.set(xlabel='Glacier area fraction', ylabel='Mean drought severity 1980-2100')
-plt.show()   
+    ax1.scatter(pg, basin_stats_hist[b][0][1]-basin_stats_hist[b][0][0], color='k')
+    ax2.scatter(pg, basin_stats_midC[b][0][1]-basin_stats_midC[b][0][0], color='k')
+    ax3.scatter(pg, basin_stats_endC[b][0][1]-basin_stats_endC[b][0][0], color='k')
+ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
+ax2.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 2030-2060', xscale='log')
+ax3.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 2070-2100', xscale='log',
+        xlim=(1E-4, 0.22))
+plt.tight_layout()
+plt.show()
+
+## Drought duration over time
+fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
+for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
+    pg = ag/a # percent glaciated
+    ax1.scatter(pg, basin_stats_hist[b][1][1]-basin_stats_hist[b][1][0], color='k')
+    ax2.scatter(pg, basin_stats_midC[b][1][1]-basin_stats_midC[b][1][0], color='k')
+    ax3.scatter(pg, basin_stats_endC[b][1][1]-basin_stats_endC[b][1][0], color='k')
+ax1.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 1980-2010', xscale='log')
+ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 2030-2060', xscale='log')
+ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 2070-2100', xscale='log',
+        xlim=(1E-4, 0.22))
+plt.tight_layout()
+plt.show()
+
+## Drought deficit over time
+fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
+for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
+    pg = ag/a # percent glaciated
+    ax1.scatter(pg, basin_stats_hist[b][2][1]-basin_stats_hist[b][2][0], color='k')
+    ax2.scatter(pg, basin_stats_midC[b][2][1]-basin_stats_midC[b][2][0], color='k')
+    ax3.scatter(pg, basin_stats_endC[b][2][1]-basin_stats_endC[b][2][0], color='k')
+ax1.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 1980-2010', xscale='log')
+ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 2030-2060', xscale='log')
+ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 2070-2100', xscale='log',
+        xlim=(1E-4, 0.22))
+plt.tight_layout()
+plt.show()
+  
