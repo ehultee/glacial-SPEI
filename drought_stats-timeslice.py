@@ -61,6 +61,20 @@ basin_stats_midC = {b: gSPEI.basin_summary_stats(SPEI_by_basin, basin_name=b, mo
 basin_stats_endC = {b: gSPEI.basin_summary_stats(SPEI_by_basin, basin_name=b, modelnames=modelnames, period=(2070,2100)) for b in basin_names}
 
 
+## All stats for historical period
+fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharex=True, figsize=(12,4))
+for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
+    pg = ag/a # percent glaciated
+    ax1.scatter(pg, basin_stats_hist[b][0][1]-basin_stats_hist[b][0][0], color='k')
+    ax2.scatter(pg, basin_stats_hist[b][1][1]-basin_stats_hist[b][1][0], color='k')
+    ax3.scatter(pg, basin_stats_hist[b][2][1]-basin_stats_hist[b][2][0], color='k')
+ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
+ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 1980-2010', xscale='log')
+ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 1980-2010', xscale='log',
+        xlim=(1E-4, 0.22))
+plt.tight_layout()
+plt.show()
+
 ## Drought number over time
 fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
 for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
