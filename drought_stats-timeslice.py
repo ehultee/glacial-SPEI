@@ -67,7 +67,7 @@ for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     pg = ag/a # percent glaciated
     ax1.scatter(pg, basin_stats_hist[b][0][1]-basin_stats_hist[b][0][0], color='k')
     ax2.scatter(pg, basin_stats_hist[b][1][1]-basin_stats_hist[b][1][0], color='k')
-    ax3.scatter(pg, basin_stats_hist[b][2][1]-basin_stats_hist[b][2][0], color='k')
+    ax3.scatter(pg, -1*(basin_stats_hist[b][2][1]-basin_stats_hist[b][2][0]), color='k')
 ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
 ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 1980-2010', xscale='log')
 ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 1980-2010', xscale='log',
@@ -107,9 +107,9 @@ plt.show()
 fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
 for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     pg = ag/a # percent glaciated
-    ax1.scatter(pg, basin_stats_hist[b][2][1]-basin_stats_hist[b][2][0], color='k')
-    ax2.scatter(pg, basin_stats_midC[b][2][1]-basin_stats_midC[b][2][0], color='k')
-    ax3.scatter(pg, basin_stats_endC[b][2][1]-basin_stats_endC[b][2][0], color='k')
+    ax1.scatter(pg, -1*(basin_stats_hist[b][2][1]-basin_stats_hist[b][2][0]), color='k')
+    ax2.scatter(pg, -1*(basin_stats_midC[b][2][1]-basin_stats_midC[b][2][0]), color='k')
+    ax3.scatter(pg, -1*(basin_stats_endC[b][2][1]-basin_stats_endC[b][2][0]), color='k')
 ax1.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 1980-2010', xscale='log')
 ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 2030-2060', xscale='log')
 ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 2070-2100', xscale='log',
