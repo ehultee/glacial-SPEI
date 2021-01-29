@@ -62,6 +62,7 @@ r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'NRunoff')
 basin_stats_bymodel = {m: {b: gSPEI.basin_summary_stats(SPEI_by_basin, basin_name=b, modelnames=[m], period=(1980,2100)) for b in basin_names} 
                     for m in modelnames}
 
+## plot per model to identify possible biases
 fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4))
 for m in modelnames:
     for b in basin_names:

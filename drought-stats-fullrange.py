@@ -65,7 +65,7 @@ basin_stats_bymodel_endC = {m: {b: gSPEI.basin_summary_stats(SPEI_by_basin, basi
                     for m in modelnames}
 
 ## All stats for historical period
-fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4))
+fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True)
 for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     pg = ag/a # percent glaciated
     number_b = []
@@ -94,19 +94,7 @@ plt.tight_layout()
 plt.show()
 
 # ## Drought number over time
-# fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
-# for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
-#     pg = ag/a # percent glaciated
-#     ax1.scatter(pg, basin_stats_hist[b][0][1]-basin_stats_hist[b][0][0], color='k')
-#     ax2.scatter(pg, basin_stats_midC[b][0][1]-basin_stats_midC[b][0][0], color='k')
-#     ax3.scatter(pg, basin_stats_endC[b][0][1]-basin_stats_endC[b][0][0], color='k')
-# ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
-# ax2.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 2030-2060', xscale='log')
-# ax3.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 2070-2100', xscale='log',
-#         xlim=(1E-4, 0.22))
-# plt.tight_layout()
-# plt.show()
-fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4))
+fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True, sharey=True)
 for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     pg = ag/a # percent glaciated
     number_hist = []
@@ -129,6 +117,37 @@ for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
 ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
 ax2.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 2030-2060', xscale='log')
 ax3.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 2070-2100', xscale='log',
+        xlim=(1E-4, 0.22))
+for ax in (ax1, ax2, ax3):
+    ax.axhline(0, ls=':', lw=1.0, color='k')
+plt.tight_layout()
+plt.show()
+
+
+## Difference of the difference
+fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True, sharey=True)
+for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
+    pg = ag/a # percent glaciated
+    number_hist = []
+    number_midC = []
+    number_endC = []
+    for m in modelnames:
+        number_hist.append(basin_stats_bymodel_hist[m][b][0][1]-basin_stats_bymodel_hist[m][b][0][0])
+        number_midC.append(basin_stats_bymodel_midC[m][b][0][1]-basin_stats_bymodel_midC[m][b][0][0])
+        number_endC.append(basin_stats_bymodel_endC[m][b][0][1]-basin_stats_bymodel_endC[m][b][0][0])
+    ax1.errorbar(pg, np.nanmean(number_hist), 
+                 yerr=(((np.nanmean(number_hist)-np.nanmin(number_hist), np.nanmax(number_hist)-np.nanmean(number_hist)),)), 
+                 color='k', marker='d', lw=1.0)
+    ax2.errorbar(pg, np.nanmean(number_midC)-np.nanmean(number_hist), 
+                 yerr=(((np.nanmean(number_midC)-np.nanmin(number_midC), np.nanmax(number_midC)-np.nanmean(number_midC)),)), 
+                 color='k', marker='d', lw=1.0)
+    ax3.errorbar(pg, np.nanmean(number_endC)-np.nanmean(number_hist), 
+                 yerr=(((np.nanmean(number_endC)-np.nanmin(number_endC), np.nanmax(number_endC)-np.nanmean(number_endC)),)), 
+                 color='k', marker='d', lw=1.0)
+    # ax3.errorbar(pg, np.nanmean(severity_b), color='k')
+ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
+ax2.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts, 2030-2060 vs historical', xscale='log')
+ax3.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts, 2070-2100 vs historical', xscale='log',
         xlim=(1E-4, 0.22))
 for ax in (ax1, ax2, ax3):
     ax.axhline(0, ls=':', lw=1.0, color='k')
