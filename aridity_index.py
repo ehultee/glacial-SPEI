@@ -39,9 +39,8 @@ for m in modelnames:
     
     
 PET_by_basin = {b: {} for b in basin_names} # potential evapotranspiration by basin
-P_by_basin = {b: {} for b in basin_names}
-AI_by_basin = {b: {} for b in basin_names} #aridity index by basin
-historical_avg_AI = [] # list for average basin aridity index over historical period
+P_by_basin = {b: {} for b in basin_names} # precipitation by basin
+historical_avg_AI = [] # list for multi-model average basin aridity index over historical period
 for i, b in enumerate(basin_names):
     PET_by_basin[b] = {s: {} for s in scenarios}
     P_by_basin[b] = {s: {} for s in scenarios}
@@ -53,31 +52,24 @@ for i, b in enumerate(basin_names):
         for m in modelnames:
             tempdict_pet[m] = PET_by_model[m][s][i] 
             tempdict_p[m] = P_by_model[m][s][i]
-            tempdict_ai[m] = np.divide(tempdict_p[m], tempdict_pet[m])
+            tempdict_ai[m] = np.nanmedian(P_by_model[m][s][i][0:959])/np.nanmedian(PET_by_model[m][s][i][0:959]) # historical avg(P)/avg(PET) for this model
+            if tempdict_ai[m]<0:
+                tempdict_ai[m] = np.nan
         PET_by_basin[b][s] = pd.DataFrame.from_dict(tempdict_pet)
         P_by_basin[b][s] = pd.DataFrame.from_dict(tempdict_p)
-        AI_by_basin[b][s] = pd.DataFrame.from_dict(tempdict_ai)
-        historical_avg_AI.append(np.median([np.median(AI_by_basin[b]['Rcp4p5'][m][0:959]) for m in modelnames]))
-# historical_avg_AI = [np.median([np.median(AI_by_basin[b]['Rcp4p5'][m][0:959]) for m in modelnames]) for b in basin_names]
+        AI_by_basin[b][s] = np.nanmedian([tempdict_ai[m] for m in modelnames])
+    historical_avg_AI.append(AI_by_basin[b]['Rcp4p5'])
 
 
 
-fig, ax = plt.subplots()
-# for m in modelnames:
-#     ax.plot(yrs, PET_by_basin['TARIM']['Rcp4p5'][m], color='k')
-ax.plot(yrs, AI_by_basin['COPPER']['Rcp4p5']['CCSM4'], color='k')
-ax.set(xlabel='Year', ylabel='Aridity index P/PET', title='Aridity index over time for COPPER basin')
-plt.show()
-
-
-fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4))
+fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True)
 for b, aridity in zip(basin_names, historical_avg_AI):
     ax1.scatter(aridity, basin_stats[b][0][1]-basin_stats[b][0][0], color='k')
     ax2.scatter(aridity, basin_stats[b][1][1]-basin_stats[b][1][0], color='k')
     ax3.scatter(aridity, basin_stats[b][2][1]-basin_stats[b][2][0], color='k')
-ax1.set(xlabel='Historical P/PET', ylabel='Mean number of droughts 1980-2100')
-ax2.set(xlabel='Historical P/PET', ylabel='Mean drought duration 1980-2100')
-ax3.set(xlabel='Historical P/PET', ylabel='Mean drought severity 1980-2100')
+ax1.set(xlabel='Historical P/PET', ylabel='Diff number of droughts 1980-2100')
+ax2.set(xlabel='Historical P/PET', ylabel='Diff drought duration 1980-2100')
+ax3.set(xlabel='Historical P/PET', ylabel='Diff drought severity 1980-2100')
 plt.tight_layout()
 plt.show()
     
