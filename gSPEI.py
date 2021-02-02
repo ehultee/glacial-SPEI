@@ -445,9 +445,8 @@ def basin_summary_stats(SPEI_dict, basin_name, modelnames, threshold=-1,
     Returns
     -------
     [(mean_drtnumber_w, mean_drtnumber_n), (mean_drtdur_w, mean_drtdur_n), 
-    (mean_drtsev_w, mean_drtsev_n)]
+    (mean_drtsev_w, mean_drtsev_n)] : array
         Drought incidence, duration, and severity pairs for this basin in the given period.
-
     """
     
     keys_w_bymodel = {m: [] for m in modelnames}

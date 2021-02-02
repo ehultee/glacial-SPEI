@@ -66,10 +66,11 @@ fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True)
 for b, aridity in zip(basin_names, historical_avg_AI):
     ax1.scatter(aridity, basin_stats[b][0][1]-basin_stats[b][0][0], color='k')
     ax2.scatter(aridity, basin_stats[b][1][1]-basin_stats[b][1][0], color='k')
-    ax3.scatter(aridity, basin_stats[b][2][1]-basin_stats[b][2][0], color='k')
-ax1.set(xlabel='Historical P/PET', ylabel='Diff number of droughts 1980-2100')
-ax2.set(xlabel='Historical P/PET', ylabel='Diff drought duration 1980-2100')
-ax3.set(xlabel='Historical P/PET', ylabel='Diff drought severity 1980-2100')
+    ax3.scatter(aridity, -1*(basin_stats[b][2][1]-basin_stats[b][2][0]), color='k')
+ax1.set(xlabel='Historical P/PET', ylabel='Diff number of droughts 1980-2100', xscale='log')
+ax2.set(xlabel='Historical P/PET', ylabel='Diff drought duration 1980-2100', xscale='log')
+ax3.set(xlabel='Historical P/PET', ylabel='Diff drought severity 1980-2100', xscale='log')
 plt.tight_layout()
 plt.show()
     
+## Broken down per timeslice
