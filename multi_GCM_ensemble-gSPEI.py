@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import gSPEI as gSPEI
 
-fpath = './data/SPEI_Files/'
+fpath = './data/SPEI_Files/variable_stom_conduct/'
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used
@@ -33,8 +33,8 @@ yrs = np.linspace(1900, 2101, num=2412)
 ## Read all in to dict by GCM as in other gSPEI scripts
 SPEI_by_model = {m: {} for m in modelnames} # create dictionary indexed by model name
 for m in modelnames:
-    norunoff_f_m = fpath+'NRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[0])
-    wrunoff_f_m = fpath+'WRunoff_{}_{}_{}.txt'.format(integration_times[3], m, scenarios[0])
+    norunoff_f_m = fpath+'NRunoff_{}_{}_{}_Conduct.txt'.format(integration_times[0], m, scenarios[1])
+    wrunoff_f_m = fpath+'WRunoff_{}_{}_{}_Conduct.txt'.format(integration_times[0], m, scenarios[1])
     SPEI_by_model[m]['NRunoff'] = np.loadtxt(norunoff_f_m)
     SPEI_by_model[m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
     SPEI_by_model[m]['diff'] = SPEI_by_model[m]['WRunoff'] - SPEI_by_model[m]['NRunoff']
@@ -43,38 +43,41 @@ for m in modelnames:
 SPEI_by_basin = gSPEI.sort_models_to_basins(SPEI_by_model)
 
 ## Compute multi-GCM ensemble means and quartiles
-r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'WRunoff').rolling(window=12*30).mean()
-r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'NRunoff').rolling(window=12*30).mean()
-rm = SPEI_by_basin['TARIM']['WRunoff'].rolling(window=12*30, axis=0).mean()
+example_b = 'COPPER'
+r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'WRunoff').rolling(window=12*30).mean()
+r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'NRunoff').rolling(window=12*30).mean()
+rm = SPEI_by_basin[example_b]['WRunoff'].rolling(window=12*30, axis=0).mean()
 rm_q1 = rm.quantile(q=0.25, axis=1)
 rm_q3 = rm.quantile(q=0.75, axis=1)
-rm_n = SPEI_by_basin['TARIM']['NRunoff'].rolling(window=12*30, axis=0).mean()
+rm_n = SPEI_by_basin[example_b]['NRunoff'].rolling(window=12*30, axis=0).mean()
 rm_q1_n = rm_n.quantile(q=0.25, axis=1)
 rm_q3_n = rm_n.quantile(q=0.75, axis=1)
 
 ## Make example figure
-single_models_w = [SPEI_by_basin['TARIM']['WRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
-single_models_n = [SPEI_by_basin['TARIM']['NRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
+# single_models_w = [SPEI_by_basin[example_b]['WRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
+# single_models_n = [SPEI_by_basin[example_b]['NRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
 
 
-colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
-colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
-fig, ax = plt.subplots()
-ax.plot(yrs, r_w, 'k', linewidth=3.0)
-ax.plot(yrs, rm_q1, 'k')
-ax.plot(yrs, rm_q3, 'k')
-ax.plot(yrs, r_n, 'k', linewidth=3.0, ls=':')
-ax.plot(yrs, rm_q1_n, 'k', ls=':')
-ax.plot(yrs, rm_q3_n, 'k', ls=':')
+# colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
+# colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
+# fig, ax = plt.subplots()
+# ax.plot(yrs, r_w, 'k', linewidth=3.0)
+# ax.plot(yrs, rm_q1, 'k')
+# ax.plot(yrs, rm_q3, 'k')
+# ax.plot(yrs, r_n, 'k', linewidth=3.0, ls=':')
+# ax.plot(yrs, rm_q1_n, 'k', ls=':')
+# ax.plot(yrs, rm_q3_n, 'k', ls=':')
 # for i in range(len(modelnames)):
-#     ax.plot(yrs, single_models_w[i], color=colors_w[i])
-#     ax.plot(yrs, single_models_n[i], color=colors_n[i])
-ax.fill_between(yrs, rm_q1, rm_q3, color='DarkBlue', alpha=0.2)
-ax.fill_between(yrs, rm_q1_n, rm_q3_n, color='DarkOrange', alpha=0.2)
-ax.tick_params(axis='both', labelsize=12)
-ax.set_xticks([1900,1950, 2000, 2050, 2100])
-ax.set_xlabel('Years', fontsize=14)
-ax.set_ylabel('Rolling mean SPEI', fontsize=14)
+#     ax.plot(yrs, single_models_w[i], color=colors_w[i], alpha=0.5)
+#     ax.plot(yrs, single_models_n[i], color=colors_n[i], alpha=0.5)
+# ax.fill_between(yrs, rm_q1, rm_q3, color='DarkBlue', alpha=0.2)
+# ax.fill_between(yrs, rm_q1_n, rm_q3_n, color='DarkOrange', alpha=0.2)
+# ax.tick_params(axis='both', labelsize=12)
+# ax.set_xticks([2000, 2050, 2100])
+# ax.set_xlim(1980, 2100)
+# ax.set_xlabel('Years', fontsize=14)
+# ax.set_ylabel('Rolling mean SPEI', fontsize=14)
+# plt.tight_layout()
 
 
 ## Calculate changes due to glacial effect at end of century, using ensemble approach
@@ -95,3 +98,38 @@ ax1.set(ylim=(-1.5, 1.0), xlim=(-0.5, 4))
 ax1.tick_params(axis='both', labelsize=12)
 plt.tight_layout()
 plt.show()
+
+
+# ## Four-basin example for manuscript
+# fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, 
+#                                               tight_layout=True, figsize=(9,6))
+# example_basins = ('COPPER', 'TARIM', 'RHONE', 'MAJES')
+# for example_b, ax in zip(example_basins, (ax1,ax2,ax3,ax4)):
+#     r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'WRunoff').rolling(window=12*30).mean()
+#     r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'NRunoff').rolling(window=12*30).mean()
+#     rm = SPEI_by_basin[example_b]['WRunoff'].rolling(window=12*30, axis=0).mean()
+#     rm_q1 = rm.quantile(q=0.25, axis=1)
+#     rm_q3 = rm.quantile(q=0.75, axis=1)
+#     rm_n = SPEI_by_basin[example_b]['NRunoff'].rolling(window=12*30, axis=0).mean()
+#     rm_q1_n = rm_n.quantile(q=0.25, axis=1)
+#     rm_q3_n = rm_n.quantile(q=0.75, axis=1)
+    
+#     ax.plot(yrs, r_w, 'k', linewidth=3.0)
+#     ax.plot(yrs, rm_q1, 'k')
+#     ax.plot(yrs, rm_q3, 'k')
+#     ax.plot(yrs, r_n, 'k', linewidth=3.0, ls=':')
+#     ax.plot(yrs, rm_q1_n, 'k', ls=':')
+#     ax.plot(yrs, rm_q3_n, 'k', ls=':')
+#     # for i in range(len(modelnames)):
+#     #     ax.plot(yrs, single_models_w[i], color=colors_w[i], alpha=0.5)
+#     #     ax.plot(yrs, single_models_n[i], color=colors_n[i], alpha=0.5)
+#     ax.fill_between(yrs, rm_q1, rm_q3, color='DarkBlue', alpha=0.2)
+#     ax.fill_between(yrs, rm_q1_n, rm_q3_n, color='DarkOrange', alpha=0.2)
+#     ax.tick_params(axis='both', labelsize=12)
+#     ax.set_xticks([2000, 2050, 2100])
+#     ax.set_xlim(1980, 2100)
+# for ax in (ax3, ax4):
+#     ax.set_xlabel('Year', fontsize=14)
+# for ax in (ax1, ax3):
+#     ax.set_ylabel('Rolling mean SPEI', fontsize=14)
+# fig1.align_ylabels()
