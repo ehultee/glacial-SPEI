@@ -40,7 +40,9 @@ for m in modelnames:
     
 PET_by_basin = {b: {} for b in basin_names} # potential evapotranspiration by basin
 P_by_basin = {b: {} for b in basin_names} # precipitation by basin
+AI_by_basin = {b: {} for b in basin_names} # AI by basin
 historical_avg_AI = [] # list for multi-model average basin aridity index over historical period
+avg_precip = []
 for i, b in enumerate(basin_names):
     PET_by_basin[b] = {s: {} for s in scenarios}
     P_by_basin[b] = {s: {} for s in scenarios}
@@ -59,18 +61,19 @@ for i, b in enumerate(basin_names):
         P_by_basin[b][s] = pd.DataFrame.from_dict(tempdict_p)
         AI_by_basin[b][s] = np.nanmedian([tempdict_ai[m] for m in modelnames])
     historical_avg_AI.append(AI_by_basin[b]['Rcp4p5'])
+    avg_precip.append(np.nanmean(P_by_basin[b]['Rcp4p5']))
 
 
 
-fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True)
-for b, aridity in zip(basin_names, historical_avg_AI):
-    ax1.scatter(aridity, basin_stats[b][0][1]-basin_stats[b][0][0], color='k')
-    ax2.scatter(aridity, basin_stats[b][1][1]-basin_stats[b][1][0], color='k')
-    ax3.scatter(aridity, -1*(basin_stats[b][2][1]-basin_stats[b][2][0]), color='k')
-ax1.set(xlabel='Historical P/PET', ylabel='Diff number of droughts 1980-2100', xscale='log')
-ax2.set(xlabel='Historical P/PET', ylabel='Diff drought duration 1980-2100', xscale='log')
-ax3.set(xlabel='Historical P/PET', ylabel='Diff drought severity 1980-2100', xscale='log')
-plt.tight_layout()
-plt.show()
+# fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True)
+# for b, aridity in zip(basin_names, historical_avg_AI):
+#     ax1.scatter(aridity, basin_stats[b][0][1]-basin_stats[b][0][0], color='k')
+#     ax2.scatter(aridity, basin_stats[b][1][1]-basin_stats[b][1][0], color='k')
+#     ax3.scatter(aridity, -1*(basin_stats[b][2][1]-basin_stats[b][2][0]), color='k')
+# ax1.set(xlabel='Historical P/PET', ylabel='Diff number of droughts 1980-2100', xscale='log')
+# ax2.set(xlabel='Historical P/PET', ylabel='Diff drought duration 1980-2100', xscale='log')
+# ax3.set(xlabel='Historical P/PET', ylabel='Diff drought severity 1980-2100', xscale='log')
+# plt.tight_layout()
+# plt.show()
     
-## Broken down per timeslice
+# ## Broken down per timeslice
