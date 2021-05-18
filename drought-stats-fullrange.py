@@ -13,7 +13,7 @@ import gSPEI as gSPEI
 
 ## Labels: (P)arametric or (NP)nonparametric;
 ## Standardization (1) lumped or (2) split by starting month
-fpath_NP2 = './data/SPEI_Files/nonparametric-var_stom_c/'
+fpath_NP2 = './data/SPEI_Files/variable_stom_conduct/'
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used
@@ -43,8 +43,8 @@ basin_glacier_area = [26893.8, 24645.4, 16606.7, 15176.7, 12998., 11216., 9535.4
 yrs = np.linspace(1900, 2101, num=2412)
 SPEI_by_model_C = {m: {} for m in modelnames} # create dictionary indexed by model name
 for m in modelnames:
-    norunoff_f_m = fpath_NP2+'NRunoff_{}_{}_{}_Conduct.txt'.format(integration_times[3], m, scenarios[0])
-    wrunoff_f_m = fpath_NP2+'WRunoff_{}_{}_{}_Conduct.txt'.format(integration_times[3], m, scenarios[0])
+    norunoff_f_m = fpath_NP2+'NRunoff_{}_{}_{}_Conduct.txt'.format(integration_times[0], m, scenarios[0])
+    wrunoff_f_m = fpath_NP2+'WRunoff_{}_{}_{}_Conduct.txt'.format(integration_times[0], m, scenarios[0])
     SPEI_by_model_C[m]['NRunoff'] = np.loadtxt(norunoff_f_m)
     SPEI_by_model_C[m]['WRunoff'] = np.loadtxt(wrunoff_f_m)
     SPEI_by_model_C[m]['diff'] = SPEI_by_model_C[m]['WRunoff'] - SPEI_by_model_C[m]['NRunoff']
@@ -76,14 +76,14 @@ for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
         duration_b.append(basin_stats_bymodel_hist[m][b][1][1]-basin_stats_bymodel_hist[m][b][1][0])
         severity_b.append(-1*(basin_stats_bymodel_hist[m][b][2][1]-basin_stats_bymodel_hist[m][b][2][0]))
     ax1.errorbar(pg, np.nanmean(number_b), 
-                 yerr=(((np.nanmean(number_b)-np.nanmin(number_b), np.nanmax(number_b)-np.nanmean(number_b)),)), 
-                 color='k', marker='d', lw=1.0)
+                 yerr=((np.nanmean(number_b)-np.nanmin(number_b), np.nanmax(number_b)-np.nanmean(number_b)),), 
+                 color='k', marker='o', lw=1.0)
     ax2.errorbar(pg, np.nanmean(duration_b), 
                  yerr=(((np.nanmean(duration_b)-np.nanmin(duration_b), np.nanmax(duration_b)-np.nanmean(duration_b)),)), 
                  color='k', marker='d', lw=1.0)
     ax3.errorbar(pg, np.nanmean(severity_b), 
                  yerr=(((np.nanmean(severity_b)-np.nanmin(severity_b), np.nanmax(severity_b)-np.nanmean(severity_b)),)), 
-                 color='k', marker='d', lw=1.0)
+                 color='k', marker='*', lw=1.0)
 ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
 ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 1980-2010', xscale='log')
 ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 1980-2010', xscale='log',
@@ -104,15 +104,36 @@ for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
         number_hist.append(basin_stats_bymodel_hist[m][b][0][1]-basin_stats_bymodel_hist[m][b][0][0])
         number_midC.append(basin_stats_bymodel_midC[m][b][0][1]-basin_stats_bymodel_midC[m][b][0][0])
         number_endC.append(basin_stats_bymodel_endC[m][b][0][1]-basin_stats_bymodel_endC[m][b][0][0])
+    midC_v_hist = np.nanmean(number_midC)-np.nanmean(number_hist)
+    if midC_v_hist >0: # buffering increasing
+        midC_color='b'
+    elif midC_v_hist==0:
+        midC_color='k'
+    elif midC_v_hist<0:
+        midC_color='r'
+    endC_v_midC = np.nanmean(number_endC)-np.nanmean(number_midC)
+    # if endC_v_midC >0:
+    #     endC_color='b'
+    # elif endC_v_midC==0:
+    #     endC_color='k'
+    # elif endC_v_midC<0:
+    #     endC_color='r'
+    endC_v_hist = np.nanmean(number_endC)-np.nanmean(number_hist)
+    if endC_v_hist >0:
+        endC_color='b'
+    elif endC_v_hist==0:
+        endC_color='k'
+    elif endC_v_hist<0:
+        endC_color='r'
     ax1.errorbar(pg, np.nanmean(number_hist), 
                  yerr=(((np.nanmean(number_hist)-np.nanmin(number_hist), np.nanmax(number_hist)-np.nanmean(number_hist)),)), 
-                 color='k', marker='d', lw=1.0)
+                 color='k', marker='o', lw=1.0)
     ax2.errorbar(pg, np.nanmean(number_midC), 
                  yerr=(((np.nanmean(number_midC)-np.nanmin(number_midC), np.nanmax(number_midC)-np.nanmean(number_midC)),)), 
-                 color='k', marker='d', lw=1.0)
+                 color=midC_color, marker='o', lw=1.0)
     ax3.errorbar(pg, np.nanmean(number_endC), 
                  yerr=(((np.nanmean(number_endC)-np.nanmin(number_endC), np.nanmax(number_endC)-np.nanmean(number_endC)),)), 
-                 color='k', marker='d', lw=1.0)
+                 color=endC_color, marker='o', lw=1.0)
     # ax3.errorbar(pg, np.nanmean(severity_b), color='k')
 ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
 ax2.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 2030-2060', xscale='log')
@@ -124,61 +145,148 @@ plt.tight_layout()
 plt.show()
 
 
-## Difference of the difference
-fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True, sharey=True)
+# ## Difference of the difference - change over time
+# fig1, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(12,4), sharex=True, sharey=True)
+# for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
+#     pg = ag/a # percent glaciated
+#     number_hist = []
+#     number_midC = []
+#     number_endC = []
+#     for m in modelnames:
+#         number_hist.append(basin_stats_bymodel_hist[m][b][0][1]-basin_stats_bymodel_hist[m][b][0][0])
+#         number_midC.append(basin_stats_bymodel_midC[m][b][0][1]-basin_stats_bymodel_midC[m][b][0][0])
+#         number_endC.append(basin_stats_bymodel_endC[m][b][0][1]-basin_stats_bymodel_endC[m][b][0][0])
+#     ax1.errorbar(pg, np.nanmean(number_hist), 
+#                  yerr=(((np.nanmean(number_hist)-np.nanmin(number_hist), np.nanmax(number_hist)-np.nanmean(number_hist)),)), 
+#                  color='k', marker='o', lw=1.0)
+#     ax2.errorbar(pg, np.nanmean(number_midC)-np.nanmean(number_hist), 
+#                  yerr=(((np.nanmean(number_midC)-np.nanmin(number_midC), np.nanmax(number_midC)-np.nanmean(number_midC)),)), 
+#                  color='k', marker='o', lw=1.0)
+#     ax3.errorbar(pg, np.nanmean(number_endC)-np.nanmean(number_hist), 
+#                  yerr=(((np.nanmean(number_endC)-np.nanmin(number_endC), np.nanmax(number_endC)-np.nanmean(number_endC)),)), 
+#                  color='k', marker='o', lw=1.0)
+#     # ax3.errorbar(pg, np.nanmean(severity_b), color='k')
+# ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
+# ax2.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts, 2030-2060 vs historical', xscale='log')
+# ax3.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts, 2070-2100 vs historical', xscale='log',
+#         xlim=(1E-4, 0.22))
+# for ax in (ax1, ax2, ax3):
+#     ax.axhline(0, ls=':', lw=1.0, color='k')
+# plt.tight_layout()
+# plt.show()
+
+  
+## Composite of all stats over time
+fig3, ((ax1,ax2, ax3), 
+       (ax4,ax5,ax6), 
+       (ax7,ax8,ax9)) = plt.subplots(3,3, sharex=True, sharey='row', figsize=(10,12))
 for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     pg = ag/a # percent glaciated
-    number_hist = []
+    number_b = []
+    duration_b = []
+    severity_b = []
     number_midC = []
     number_endC = []
+    duration_midC = []
+    duration_endC = []
+    severity_midC = []
+    severity_endC = []
+
     for m in modelnames:
-        number_hist.append(basin_stats_bymodel_hist[m][b][0][1]-basin_stats_bymodel_hist[m][b][0][0])
+        number_b.append(basin_stats_bymodel_hist[m][b][0][1]-basin_stats_bymodel_hist[m][b][0][0])
+        duration_b.append(basin_stats_bymodel_hist[m][b][1][1]-basin_stats_bymodel_hist[m][b][1][0])
+        severity_b.append(-1*(basin_stats_bymodel_hist[m][b][2][1]-basin_stats_bymodel_hist[m][b][2][0]))
         number_midC.append(basin_stats_bymodel_midC[m][b][0][1]-basin_stats_bymodel_midC[m][b][0][0])
         number_endC.append(basin_stats_bymodel_endC[m][b][0][1]-basin_stats_bymodel_endC[m][b][0][0])
-    ax1.errorbar(pg, np.nanmean(number_hist), 
-                 yerr=(((np.nanmean(number_hist)-np.nanmin(number_hist), np.nanmax(number_hist)-np.nanmean(number_hist)),)), 
+        duration_midC.append(basin_stats_bymodel_midC[m][b][1][1]-basin_stats_bymodel_midC[m][b][1][0])
+        duration_endC.append(basin_stats_bymodel_endC[m][b][1][1]-basin_stats_bymodel_endC[m][b][1][0])
+        severity_midC.append(-1*(basin_stats_bymodel_midC[m][b][2][1]-basin_stats_bymodel_midC[m][b][2][0]))
+        severity_endC.append(-1*(basin_stats_bymodel_endC[m][b][2][1]-basin_stats_bymodel_endC[m][b][2][0]))
+   
+    ## Color code changes over time
+    midC_v_hist_n = np.nanmean(number_midC)-np.nanmean(number_b)
+    if midC_v_hist_n >0: # buffering on number increasing
+        midC_color_n='dodgerblue'
+    elif midC_v_hist_n==0:
+        midC_color_n='k'
+    elif midC_v_hist_n<0:
+        midC_color_n='crimson'
+    endC_v_hist_n = np.nanmean(number_endC)-np.nanmean(number_b)
+    if endC_v_hist_n >0:
+        endC_color_n='dodgerblue'
+    elif endC_v_hist_n==0:
+        endC_color_n='k'
+    elif endC_v_hist_n<0:
+        endC_color_n='crimson'
+        
+    midC_v_hist_d = np.nanmean(duration_midC)-np.nanmean(duration_b)
+    if midC_v_hist_d >0: # buffering on duration increasing
+        midC_color_d='dodgerblue'
+    elif midC_v_hist_d==0:
+        midC_color_d='k'
+    elif midC_v_hist_d<0:
+        midC_color_d='crimson'
+    endC_v_hist_d = np.nanmean(duration_endC)-np.nanmean(duration_b)
+    if endC_v_hist_d >0:
+        endC_color_d='dodgerblue'
+    elif endC_v_hist_d==0:
+        endC_color_d='k'
+    elif endC_v_hist_d<0:
+        endC_color_d='crimson'
+        
+    midC_v_hist_s = np.nanmean(severity_midC)-np.nanmean(severity_b)
+    if midC_v_hist_s >0: # buffering on duration increasing
+        midC_color_s='dodgerblue'
+    elif midC_v_hist_s==0:
+        midC_color_s='k'
+    elif midC_v_hist_s<0:
+        midC_color_s='crimson'
+    endC_v_hist_s = np.nanmean(severity_endC)-np.nanmean(severity_b)
+    if endC_v_hist_s >0:
+        endC_color_s='dodgerblue'
+    elif endC_v_hist_s==0:
+        endC_color_s='k'
+    elif endC_v_hist_s<0:
+        endC_color_s='crimson'
+    ## First column: historical
+    ax1.errorbar(pg, np.nanmean(number_b), 
+                 yerr=((np.nanmean(number_b)-np.nanmin(number_b), np.nanmax(number_b)-np.nanmean(number_b)),), 
+                 color='k', marker='o', lw=1.0)
+    ax4.errorbar(pg, np.nanmean(duration_b), 
+                 yerr=(((np.nanmean(duration_b)-np.nanmin(duration_b), np.nanmax(duration_b)-np.nanmean(duration_b)),)), 
                  color='k', marker='d', lw=1.0)
-    ax2.errorbar(pg, np.nanmean(number_midC)-np.nanmean(number_hist), 
+    ax7.errorbar(pg, np.nanmean(severity_b), 
+                 yerr=(((np.nanmean(severity_b)-np.nanmin(severity_b), np.nanmax(severity_b)-np.nanmean(severity_b)),)), 
+                 color='k', marker='*', lw=1.0)
+    ## Second column: mid-c
+    ax2.errorbar(pg, np.nanmean(number_midC), 
                  yerr=(((np.nanmean(number_midC)-np.nanmin(number_midC), np.nanmax(number_midC)-np.nanmean(number_midC)),)), 
-                 color='k', marker='d', lw=1.0)
-    ax3.errorbar(pg, np.nanmean(number_endC)-np.nanmean(number_hist), 
+                 color=midC_color_n, marker='o', lw=1.0)
+    ax5.errorbar(pg, np.nanmean(duration_midC), 
+                 yerr=(((np.nanmean(duration_midC)-np.nanmin(duration_midC), np.nanmax(duration_midC)-np.nanmean(duration_midC)),)), 
+                 color=midC_color_d, marker='d', lw=1.0)
+    ax8.errorbar(pg, np.nanmean(severity_midC), 
+                 yerr=(((np.nanmean(severity_midC)-np.nanmin(severity_midC), np.nanmax(severity_midC)-np.nanmean(severity_midC)),)), 
+                 color=midC_color_s, marker='*', lw=1.0)
+    ## Third column: end of century
+    ax3.errorbar(pg, np.nanmean(number_endC), 
                  yerr=(((np.nanmean(number_endC)-np.nanmin(number_endC), np.nanmax(number_endC)-np.nanmean(number_endC)),)), 
-                 color='k', marker='d', lw=1.0)
-    # ax3.errorbar(pg, np.nanmean(severity_b), color='k')
-ax1.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts 1980-2010', xscale='log')
-ax2.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts, 2030-2060 vs historical', xscale='log')
-ax3.set(xlabel='Glacier area fraction', ylabel='Diff. number of droughts, 2070-2100 vs historical', xscale='log',
-        xlim=(1E-4, 0.22))
-for ax in (ax1, ax2, ax3):
+                 color=endC_color_n, marker='o', lw=1.0)
+    ax6.errorbar(pg, np.nanmean(duration_endC), 
+                 yerr=(((np.nanmean(duration_endC)-np.nanmin(duration_endC), np.nanmax(duration_endC)-np.nanmean(duration_endC)),)), 
+                 color=endC_color_d, marker='d', lw=1.0)
+    ax9.errorbar(pg, np.nanmean(severity_endC), 
+                 yerr=(((np.nanmean(severity_endC)-np.nanmin(severity_endC), np.nanmax(severity_endC)-np.nanmean(severity_endC)),)), 
+                 color=endC_color_s, marker='*', lw=1.0)
+
+ax1.set(ylabel=r'$\Delta$ Number', title='Historical (1980-2010)', xscale='log')
+ax2.set(title='Mid-21st Cent. (2030-2060)')
+ax3.set(title='End 21st Cent. (2070-2100)')
+ax4.set(ylabel=r'$\Delta$ Duration', xscale='log')
+ax7.set(ylabel=r'$\Delta$ Severity', 
+        xscale='log',xlabel='Glacier area fraction', xlim=(1E-4, 0.23))
+ax8.set(xlabel='Glacier area fraction', xlim=(1E-4, 0.23))
+ax9.set(xlabel='Glacier area fraction', xlim=(1E-4, 0.23))
+for ax in (ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9):
     ax.axhline(0, ls=':', lw=1.0, color='k')
-plt.tight_layout()
-plt.show()
-
-# ## Drought duration over time
-# fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
-# for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
-#     pg = ag/a # percent glaciated
-#     ax1.scatter(pg, basin_stats_hist[b][1][1]-basin_stats_hist[b][1][0], color='k')
-#     ax2.scatter(pg, basin_stats_midC[b][1][1]-basin_stats_midC[b][1][0], color='k')
-#     ax3.scatter(pg, basin_stats_endC[b][1][1]-basin_stats_endC[b][1][0], color='k')
-# ax1.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 1980-2010', xscale='log')
-# ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 2030-2060', xscale='log')
-# ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought duration 2070-2100', xscale='log',
-#         xlim=(1E-4, 0.22))
-# plt.tight_layout()
-# plt.show()
-
-# ## Drought deficit over time
-# fig, (ax1,ax2,ax3) = plt.subplots(1,3, sharey=True, sharex=True, figsize=(12,4))
-# for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
-#     pg = ag/a # percent glaciated
-#     ax1.scatter(pg, -1*(basin_stats_hist[b][2][1]-basin_stats_hist[b][2][0]), color='k')
-#     ax2.scatter(pg, -1*(basin_stats_midC[b][2][1]-basin_stats_midC[b][2][0]), color='k')
-#     ax3.scatter(pg, -1*(basin_stats_endC[b][2][1]-basin_stats_endC[b][2][0]), color='k')
-# ax1.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 1980-2010', xscale='log')
-# ax2.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 2030-2060', xscale='log')
-# ax3.set(xlabel='Glacier area fraction', ylabel='Diff. drought deficit 2070-2100', xscale='log',
-#         xlim=(1E-4, 0.22))
-# plt.tight_layout()
-# plt.show()
-  
+    
