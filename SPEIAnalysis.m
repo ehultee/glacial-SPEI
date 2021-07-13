@@ -22,9 +22,26 @@ daysmon=[31,28,31,30,31,30,31,31,30,31,30,31];
 load('ModelSetFin.mat') % These are the models and simulations corresponding to the data in ModData,
 % these are all models that had the necessary variables not just those in
 % Huss and Hock (2018)
+InVal=InVal([4,9,16,19,22,24,29,32]); % This limits to just the models that have glacial runoff from Huss and Hock (2018)
 % Getting the percent glaciated:
 PercGlac=dlmread('GlacialArea.txt')./BasinArea;
 GlacArea=dlmread('GlacialArea.txt');
+ModNam={'CanESM2','CCSM4','CNRM-CM5','CSIRO-Mk3-6-0','GISS-E2-R','INMCM4','MIROC-ESM','NorESM1-M'};
+
+%
+%
+%
+% Reading in and processing the global carbon dioxide emissions
+Rcp45CDIO=xlsread('RCP45_CDIO.xls');
+Rcp85CDIO=xlsread('RCP85_CDIO.xls');
+Rcp45year=Rcp45CDIO(:,1)';
+Rcp85year=Rcp85CDIO(:,1)';
+Rcp45CDIO=Rcp45CDIO(find(Rcp45year==1860):find(Rcp45year==2100),2);
+Rcp85CDIO=Rcp85CDIO(find(Rcp45year==1860):find(Rcp45year==2100),2);
+Rcp45CDIO=repmat(Rcp45CDIO,1,12);
+Rcp45CDIO=reshape(Rcp45CDIO',2892,1);
+Rcp85CDIO=repmat(Rcp85CDIO,1,12);
+Rcp85CDIO=reshape(Rcp85CDIO',2892,1);
 
 %
 %
@@ -43,7 +60,7 @@ for i=1:length(InVal)
         VP=(squeeze(DataRcp4p5(i,4,j,:)).*squeeze(DataRcp4p5(i,2,j,:)))./(0.622*ones(length(time),1)+0.378*squeeze(DataRcp4p5(i,4,j,:)));
         
         % PET
-        [PETIn,~]=penmont_model_q(squeeze(DataRcp4p5(i,1,j,:))-273.15,NETRAD,VP,squeeze(DataRcp4p5(i,2,j,:)));
+        [PETIn,~]=penmont_model_q_conduct(squeeze(DataRcp4p5(i,1,j,:))-273.15,NETRAD,VP,squeeze(DataRcp4p5(i,2,j,:)),Rcp45CDIO);
         PETRcp4p5(i,j,:)=PETIn;
         
     end
@@ -59,13 +76,13 @@ for i=1:length(InVal)
         VP=(squeeze(DataRcp8p5(i,4,j,:)).*squeeze(DataRcp8p5(i,2,j,:)))./(0.622*ones(length(time),1)+0.378*squeeze(DataRcp8p5(i,4,j,:)));
         
         % PET
-        [PETIn,~]=penmont_model_q(squeeze(DataRcp8p5(i,1,j,:))-273.15,NETRAD,VP,squeeze(DataRcp8p5(i,2,j,:)));
+        [PETIn,~]=penmont_model_q_conduct(squeeze(DataRcp8p5(i,1,j,:))-273.15,NETRAD,VP,squeeze(DataRcp8p5(i,2,j,:)),Rcp85CDIO);
         PETRcp8p5(i,j,:)=PETIn;
         
     end
 end
 
-% Getting P
+% Rescaling P to the correct units and saving to a specific variable
 PRECRcp4p5=squeeze(DataRcp4p5(:,3,:,:))*60*60*24; %kg/m2s to mm/day;
 PRECRcp8p5=squeeze(DataRcp8p5(:,3,:,:))*60*60*24; %kg/m2s to mm/day;
 
@@ -76,28 +93,37 @@ PRECRcp4p5=PRECRcp4p5(:,:,find(time==1900):end);
 PRECRcp8p5=PRECRcp8p5(:,:,find(time==1900):end);
 time=single(time(find(time==1900):end));
 
-% Grabbing only the models of interest:
-% CanESM2 (4)
-% CCSM4 (9)
-% CNRM-CM5 (16)
-% CSIRO-Mk3-6-0 (19)
-% GISS-E2-R (22)
-% INMCM4 (24)
-% MIROC-ESM (29)
-% NorESM1-M (32)
-PETRcp4p5=PETRcp4p5([4,9,16,19,22,24,29,32],:,:);
-PETRcp8p5=PETRcp8p5([4,9,16,19,22,24,29,32],:,:);
-PRECRcp4p5=PRECRcp4p5([4,9,16,19,22,24,29,32],:,:);
-PRECRcp8p5=PRECRcp8p5([4,9,16,19,22,24,29,32],:,:);
+%
+%
+%
+% Converting from mm/day to m cubed/month: 
+% (1/1000) is mm to m;
+% repmat(daysmon',[1452/12 1])) is /day to /month;
+% (repmat(GlacArea(i),[1452 1])*1000000) is the basin area to get volume water
+PETRcp4p5Scal=nan(size(PETRcp4p5));
+PETRcp8p5Scal=nan(size(PETRcp8p5));
+PRECRcp4p5Scal=nan(size(PRECRcp4p5));
+PRECRcp8p5Scal=nan(size(PRECRcp8p5));
+for kk=1:length(ModNam)
+    for i=1:56
+        PETRcp4p5Scal(kk,i,:)=squeeze(PETRcp4p5(kk,i,:)*(1/1000)).*repmat(daysmon',[2412/12 1]).*(repmat(BasinArea(i),[2412 1])*1000000);
+        PETRcp8p5Scal(kk,i,:)=squeeze(PETRcp8p5(kk,i,:)*(1/1000)).*repmat(daysmon',[2412/12 1]).*(repmat(BasinArea(i),[2412 1])*1000000);
+        PRECRcp4p5Scal(kk,i,:)=squeeze(PRECRcp4p5(kk,i,:)*(1/1000)).*repmat(daysmon',[2412/12 1]).*(repmat(BasinArea(i),[2412 1])*1000000);
+        PRECRcp8p5Scal(kk,i,:)=squeeze(PRECRcp8p5(kk,i,:)*(1/1000)).*repmat(daysmon',[2412/12 1]).*(repmat(BasinArea(i),[2412 1])*1000000);
+    end
+end
+PETRcp4p5=PETRcp4p5Scal;
+PETRcp8p5=PETRcp8p5Scal;
+PRECRcp4p5=PRECRcp4p5Scal;
+PRECRcp8p5=PRECRcp8p5Scal;
 
 %
 %
 %
 % Loading in the files with glacier runoff
-ModNam={'CanESM2','CCSM4','CNRM-CM5','CSIRO-Mk3-6-0','GISS-E2-R','INMCM4','MIROC-ESM','NorESM1-M'};
 RunoffRcp4p5=nan(length(ModNam),56,1452);   
 for kk=1:length(ModNam)
-    A=importdata(['discharge',ModNam{kk},'_rcp45.dat'],' ',2);
+    A=importdata(['discharge_',ModNam{kk},'_rcp45.dat'],' ',2);
     In=A.data;
     for i=1:56
         In2=In(find(In(:,1)==BasinInd(i)),3:14)*10^6;
@@ -106,27 +132,11 @@ for kk=1:length(ModNam)
 end
 RunoffRcp8p5=nan(length(ModNam),56,1452); 
 for kk=1:length(ModNam)
-    A=importdata(['discharge',ModNam{kk},'_rcp85.dat'],' ',2);
+    A=importdata(['discharge_',ModNam{kk},'_rcp85.dat'],' ',2);
     In=A.data;
     for i=1:56
         In2=In(find(In(:,1)==BasinInd(i)),3:14)*10^6;
         RunoffRcp8p5(kk,i,:)=reshape(In2',size(In2,1)*12,1);
-    end
-end
-
-% Scaling to correct units <-- Make sure the area part is correct, % dividing by the basin area to go from volume, 1000000 is to get to meters2 from km2
-for kk=1:length(ModNam)
-    for i=1:56
-    RunoffRcp4p5(kk,i,:)=squeeze(RunoffRcp4p5(kk,i,:))./(repmat(GlacArea(i),[1452 1])*1000000); % dividing by the basin area to go from volume, 1000000 is to get to meters2 from km2
-    RunoffRcp8p5(kk,i,:)=squeeze(RunoffRcp8p5(kk,i,:))./(repmat(GlacArea(i),[1452 1])*1000000);  % dividing by the basin area to go from volume, 1000000 is to get to meters2 from km2
-    end
-end
-
-% getting things to mm/day from m/month
-for kk=1:length(ModNam)
-    for i=1:56
-    RunoffRcp4p5(kk,i,:)=(squeeze(RunoffRcp4p5(kk,i,:))./repmat(daysmon',[1452/12 1]))*1000; 
-    RunoffRcp8p5(kk,i,:)=(squeeze(RunoffRcp8p5(kk,i,:))./repmat(daysmon',[1452/12 1]))*1000; 
     end
 end
 
@@ -139,52 +149,50 @@ DRcp8p5=PRECRcp8p5-PETRcp8p5;
 DRcp4p5wRf=PRECRcp4p5-PETRcp4p5;
 DRcp8p5wRf=PRECRcp8p5-PETRcp8p5;
 
-% Have to fix this...
+%
+%
+%
+% Adding in the glacial runoff
 for i=1:length(ModNam)
-DRcp4p5wRf(i,:,find(time==1980):end)=repmat((1-PercGlac)',[1 1452]).*(squeeze(PRECRcp4p5(i,:,find(time==1980):end))-squeeze(PETRcp4p5(i,:,find(time==1980):end)))+repmat(PercGlac',[1 1452]).*squeeze(RunoffRcp4p5(i,:,:)); % w/ runoff
-DRcp8p5wRf(i,:,find(time==1980):end)=repmat((1-PercGlac)',[1 1452]).*(squeeze(PRECRcp8p5(i,:,find(time==1980):end))-squeeze(PETRcp8p5(i,:,find(time==1980):end)))+repmat(PercGlac',[1 1452]).*squeeze(RunoffRcp8p5(i,:,:)); % w/ runoff
+    DRcp4p5wRf(i,:,find(time==1980):end)=repmat((1-PercGlac)',[1 1452]).*(squeeze(PRECRcp4p5(i,:,find(time==1980):end)))+squeeze(RunoffRcp4p5(i,:,:))-squeeze(PETRcp4p5(i,:,find(time==1980):end)); % w/ runoff
+    DRcp8p5wRf(i,:,find(time==1980):end)=repmat((1-PercGlac)',[1 1452]).*(squeeze(PRECRcp8p5(i,:,find(time==1980):end)))+squeeze(RunoffRcp8p5(i,:,:))-squeeze(PETRcp8p5(i,:,find(time==1980):end)); % w/ runoff
 end
-% So this is percentage glacier time runoff but percentage not glacier time
-% precipitation minus the PET
-
 
 %
 %
 %
-% Calculating SPEI 3,7,11,15,19,23,27 months:
-scalvals=[3,7,11,15,19,23,27];
+% Calculating the 3 month non parametric SPEI:
+scalval=3;
 timey=reshape(repmat([1900:2100],[12 1]),12*length([1900:2100]),1);
-SPEIRcp4p5=nan(2,length(scalvals),length(ModNam),length(BasinNam),length(time));
-SPEIRcp8p5=nan(2,length(scalvals),length(ModNam),length(BasinNam),length(time));
+SPEIRcp4p5=nan(2,length(ModNam),length(BasinNam),length(time));
+SPEIRcp8p5=nan(2,length(ModNam),length(BasinNam),length(time));
 for i=1:length(ModNam)
     for j=1:length(BasinNam)
-        for k=1:length(scalvals)
         
         % Fixing the output time
-        erase_yr=ceil(scalvals(k)/12);
+        erase_yr=ceil(scalval/12);
         nseas=12;
         
         % Original Rcp4p5    
-        [Z,Z_std]=SPEI_time3(squeeze(DRcp4p5(i,j,:)),scalvals(k),12,timey,1900,1979);
-        SPEIRcp4p5(1,k,i,j,nseas*erase_yr-scalvals(k)+1:end-scalvals(k))=Z;
+        [Z,Z_std]=SPEI_Calc(squeeze(DRcp4p5(i,j,:)),scalval,12,timey,1900,1979);
+        SPEIRcp4p5(1,i,j,nseas*erase_yr-scalval+1:end-scalval)=Z;
         Z_std % Should always be ~1
         
         % Runoff Rcp4p5
-        [Z,Z_std]=SPEI_time3(squeeze(DRcp4p5wRf(i,j,:)),scalvals(k),12,timey,1900,1979);
-        SPEIRcp4p5(2,k,i,j,nseas*erase_yr-scalvals(k)+1:end-scalvals(k))=Z;
+        [Z,Z_std]=SPEI_Calc(squeeze(DRcp4p5wRf(i,j,:)),scalval,12,timey,1900,1979);
+        SPEIRcp4p5(2,i,j,nseas*erase_yr-scalval+1:end-scalval)=Z;
         Z_std
         
         % Original Rcp8p5
-        [Z,Z_std]=SPEI_time3(squeeze(DRcp8p5(i,j,:)),scalvals(k),12,timey,1900,1979);
-        SPEIRcp8p5(1,k,i,j,nseas*erase_yr-scalvals(k)+1:end-scalvals(k))=Z;
+        [Z,Z_std]=SPEI_Calc(squeeze(DRcp8p5(i,j,:)),scalval,12,timey,1900,1979);
+        SPEIRcp8p5(1,i,j,nseas*erase_yr-scalval+1:end-scalval)=Z;
         Z_std
         
         % Runoff Rcp8p5
-        [Z,Z_std]=SPEI_time3(squeeze(DRcp8p5wRf(i,j,:)),scalvals(k),12,timey,1900,1979);
-        SPEIRcp8p5(2,k,i,j,nseas*erase_yr-scalvals(k)+1:end-scalvals(k))=Z;
+        [Z,Z_std]=SPEI_Calc(squeeze(DRcp8p5wRf(i,j,:)),scalval,12,timey,1900,1979);
+        SPEIRcp8p5(2,i,j,nseas*erase_yr-scalval+1:end-scalval)=Z;
         Z_std
         
-        end
     end
 end
 
@@ -192,4 +200,48 @@ end
 %
 %
 % Saving the output:
-save SPEIOut SPEIRcp4p5 SPEIRcp8p5 timey time scalvals ModNam
+save SPEIOut SPEIRcp4p5 SPEIRcp8p5 timey time  ModNam
+
+function [Out,Out_std]=SPEI_Calc(Data,scale,nseas,yr_vect,y1,y2)
+
+            % Data setting to scaled dataset
+            erase_yr=ceil(scale/12);
+            A1=[];
+            for is=1:scale, A1=[A1,Data(is:length(Data)-scale+is)];end
+            XS=sum(A1,2);
+
+            if(scale>1), XS(1:nseas*erase_yr-scale+1)=[];   end
+            
+            % Trim the year vector
+            yr_vect(1:nseas*erase_yr)=[];
+            
+            % Compute the standardized index
+            nn=length(XS);
+            SI1=zeros(nn,1);
+            for k=1:12
+            d=XS(k:12:nn);
+            yr_in=yr_vect(k:12:nn);
+            syear=find(yr_in==y1);
+            if isempty(syear)==1
+               syear=1;
+            end
+            eyear=find(yr_in==y2);
+            nnn=length(d);
+            bp=zeros(nnn,1);
+            for i=1:nnn
+            bp(i,1)=sum(d(syear:eyear,1)<=d(i,1));
+            end
+            y=(bp-0.44)./(length(d(syear:eyear,1))+0.12);
+            SI1(k:12:nn,1)=y;
+            end
+            Out1=norminv(SI1(:,1));
+            i_yr=find(yr_vect>=y1 & yr_vect<=y2);
+            Out=Out1;
+            
+            % Setting values below standardization range to -3:
+            Out(isnan(Out)==1)=-3;
+            
+            % Check the standard deviation of the standardization
+            % interval:
+            Out_std=std(Out(i_yr));
+end
