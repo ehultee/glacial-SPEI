@@ -52,6 +52,9 @@ for m in modelnames:
     
 ## Re-structure dictionary and create pandas DataFrames aggregated by basin
 SPEI_by_basin = gSPEI.sort_models_to_basins(SPEI_by_model_C)
+for b in basin_names:
+    for t in ('NRunoff', 'WRunoff', 'diff'):
+        SPEI_by_basin[b][t] = SPEI_by_basin[b][t].fillna(-3)
 
 ## Analyse multi-model ensemble mean & quantiles for drought statistics
 r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, 'TARIM', 'WRunoff')
