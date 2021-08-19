@@ -14,7 +14,7 @@ import gSPEI as gSPEI
 
 ## Labels: (P)arametric or (NP)nonparametric;
 ## Standardization (1) lumped or (2) split by starting month
-fpath_NP2 = './data/SPEI_Files/variable_stom_conduct/'
+fpath_NP2 = './data/SPEI_Files/nonparametric-var_stom_c/'
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used
@@ -211,78 +211,96 @@ for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     ## Color code changes over time
     midC_v_hist_n = np.nanmean(number_midC)-np.nanmean(number_b)
     if midC_v_hist_n >0: # buffering on number increasing
-        midC_color_n='dodgerblue'
+        midC_color_n=inc_color
+        midC_marker_n='^'
     elif midC_v_hist_n==0:
         midC_color_n='k'
+        midC_marker_n='o'
     elif midC_v_hist_n<0:
-        midC_color_n='crimson'
+        midC_color_n=dec_color
+        midC_marker_n='v'
     endC_v_hist_n = np.nanmean(number_endC)-np.nanmean(number_b)
     if endC_v_hist_n >0:
-        endC_color_n='dodgerblue'
+        endC_color_n=inc_color
+        endC_marker_n='^'
     elif endC_v_hist_n==0:
         endC_color_n='k'
+        endC_marker_n='o'
     elif endC_v_hist_n<0:
-        endC_color_n='crimson'
+        endC_color_n=dec_color
+        endC_marker_n='v'
         
     midC_v_hist_d = np.nanmean(duration_midC)-np.nanmean(duration_b)
     if midC_v_hist_d >0: # buffering on duration increasing
-        midC_color_d='dodgerblue'
+        midC_color_d=inc_color
+        midC_marker_d='^'
     elif midC_v_hist_d==0:
         midC_color_d='k'
+        midC_marker_d='o'
     elif midC_v_hist_d<0:
-        midC_color_d='crimson'
+        midC_color_d=dec_color
+        midC_marker_d='v'
     endC_v_hist_d = np.nanmean(duration_endC)-np.nanmean(duration_b)
     if endC_v_hist_d >0:
-        endC_color_d='dodgerblue'
+        endC_color_d=inc_color
+        endC_marker_d='^'
     elif endC_v_hist_d==0:
         endC_color_d='k'
+        endC_marker_d='o'
     elif endC_v_hist_d<0:
-        endC_color_d='crimson'
+        endC_color_d=dec_color
+        endC_marker_d='v'
         
     midC_v_hist_s = np.nanmean(severity_midC)-np.nanmean(severity_b)
     if midC_v_hist_s >0: # buffering on duration increasing
-        midC_color_s='dodgerblue'
+        midC_color_s=inc_color
+        midC_marker_s='^'
     elif midC_v_hist_s==0:
         midC_color_s='k'
+        midC_marker_s='o'
     elif midC_v_hist_s<0:
-        midC_color_s='crimson'
+        midC_color_s=dec_color
+        midC_marker_s='v'
     endC_v_hist_s = np.nanmean(severity_endC)-np.nanmean(severity_b)
     if endC_v_hist_s >0:
-        endC_color_s='dodgerblue'
+        endC_color_s=inc_color
+        endC_marker_s='^'
     elif endC_v_hist_s==0:
         endC_color_s='k'
+        endC_marker_s='o'
     elif endC_v_hist_s<0:
-        endC_color_s='crimson'
+        endC_color_s=dec_color
+        endC_marker_s='v'
     ## First column: historical
     ax1.errorbar(pg, np.nanmean(number_b), 
                  yerr=((np.nanmean(number_b)-np.nanmin(number_b), np.nanmax(number_b)-np.nanmean(number_b)),), 
                  color='k', marker='o', lw=1.0)
     ax4.errorbar(pg, np.nanmean(duration_b), 
                  yerr=(((np.nanmean(duration_b)-np.nanmin(duration_b), np.nanmax(duration_b)-np.nanmean(duration_b)),)), 
-                 color='k', marker='d', lw=1.0)
+                 color='k', marker='o', lw=1.0, alpha=0.8)
     ax7.errorbar(pg, np.nanmean(severity_b), 
                  yerr=(((np.nanmean(severity_b)-np.nanmin(severity_b), np.nanmax(severity_b)-np.nanmean(severity_b)),)), 
-                 color='k', marker='*', lw=1.0)
+                 color='k', marker='o', lw=1.0)
     ## Second column: mid-c
     ax2.errorbar(pg, np.nanmean(number_midC), 
                  yerr=(((np.nanmean(number_midC)-np.nanmin(number_midC), np.nanmax(number_midC)-np.nanmean(number_midC)),)), 
-                 color=midC_color_n, marker='o', lw=1.0)
+                 color=midC_color_n, marker=midC_marker_n, lw=1.0)
     ax5.errorbar(pg, np.nanmean(duration_midC), 
                  yerr=(((np.nanmean(duration_midC)-np.nanmin(duration_midC), np.nanmax(duration_midC)-np.nanmean(duration_midC)),)), 
-                 color=midC_color_d, marker='d', lw=1.0)
+                 color=midC_color_d, marker=midC_marker_d, lw=1.0)
     ax8.errorbar(pg, np.nanmean(severity_midC), 
                  yerr=(((np.nanmean(severity_midC)-np.nanmin(severity_midC), np.nanmax(severity_midC)-np.nanmean(severity_midC)),)), 
-                 color=midC_color_s, marker='*', lw=1.0)
+                 color=midC_color_s, marker=midC_marker_s, lw=1.0)
     ## Third column: end of century
     ax3.errorbar(pg, np.nanmean(number_endC), 
                  yerr=(((np.nanmean(number_endC)-np.nanmin(number_endC), np.nanmax(number_endC)-np.nanmean(number_endC)),)), 
-                 color=endC_color_n, marker='o', lw=1.0)
+                 color=endC_color_n, marker=endC_marker_n, lw=1.0)
     ax6.errorbar(pg, np.nanmean(duration_endC), 
                  yerr=(((np.nanmean(duration_endC)-np.nanmin(duration_endC), np.nanmax(duration_endC)-np.nanmean(duration_endC)),)), 
-                 color=endC_color_d, marker='d', lw=1.0)
+                 color=endC_color_d, marker=endC_marker_d, lw=1.0)
     ax9.errorbar(pg, np.nanmean(severity_endC), 
                  yerr=(((np.nanmean(severity_endC)-np.nanmin(severity_endC), np.nanmax(severity_endC)-np.nanmean(severity_endC)),)), 
-                 color=endC_color_s, marker='*', lw=1.0)
+                 color=endC_color_s, marker=endC_marker_s, lw=1.0)
 
 ax1.set(ylabel=r'$\Delta$ Number', title='Historical (1980-2010)', xscale='log')
 ax2.set(title='Mid-21st Cent. (2030-2060)')

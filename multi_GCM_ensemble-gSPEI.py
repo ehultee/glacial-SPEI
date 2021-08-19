@@ -105,6 +105,9 @@ rm_q3_n = rm_n.quantile(q=0.75, axis=1)
 
 
 ## Four-basin example for manuscript
+color_fam = cm.get_cmap('tab20b')
+color_with = color_fam(0)
+color_no = color_fam(10)
 fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, 
                                               tight_layout=True, figsize=(9,6))
 example_basins = ('COPPER', 'TARIM', 'RHONE', 'MAJES')
@@ -127,11 +130,16 @@ for example_b, ax in zip(example_basins, (ax1,ax2,ax3,ax4)):
     # for i in range(len(modelnames)):
     #     ax.plot(yrs, single_models_w[i], color=colors_w[i], alpha=0.5)
     #     ax.plot(yrs, single_models_n[i], color=colors_n[i], alpha=0.5)
-    ax.fill_between(yrs, rm_q1, rm_q3, color='DarkBlue', alpha=0.2)
-    ax.fill_between(yrs, rm_q1_n, rm_q3_n, color='DarkOrange', alpha=0.2)
+    ax.fill_between(yrs, rm_q1, rm_q3, color=color_with, alpha=0.4)
+    ax.fill_between(yrs, rm_q1_n, rm_q3_n, color=color_no, alpha=0.4)
     ax.tick_params(axis='both', labelsize=12)
     ax.set_xticks([2000, 2050, 2100])
     ax.set_xlim(1980, 2100)
+    extra = Rectangle((0,0), 0.1, 0.1, fc='w', fill=False, 
+                      edgecolor='none', linewidth=0)
+    leg = ax.legend([extra], [example_b], loc='best', 
+                    handlelength=0, handletextpad=0, fancybox=True,
+                    prop={'size':13})
 for ax in (ax3, ax4):
     ax.set_xlabel('Year', fontsize=14)
 for ax in (ax1, ax3):

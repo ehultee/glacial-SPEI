@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import gSPEI as gSPEI
 
-fpath = './data/SPEI_Files/variable_stom_conduct/'
+fpath = './data/SPEI_Files/nonparametric-var_stom_c/'
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used
