@@ -9,6 +9,7 @@ Plot range of drought stats as well as mean
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import gSPEI as gSPEI
 
 ## Labels: (P)arametric or (NP)nonparametric;
@@ -177,6 +178,10 @@ plt.show()
 
   
 ## Composite of all stats over time
+color_fam = cm.get_cmap('tab20b')
+inc_color=color_fam(5)
+dec_color=color_fam(17)
+
 fig3, ((ax1,ax2, ax3), 
        (ax4,ax5,ax6), 
        (ax7,ax8,ax9)) = plt.subplots(3,3, sharex=True, sharey='row', figsize=(10,12))

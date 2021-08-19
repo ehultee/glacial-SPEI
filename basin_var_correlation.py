@@ -15,7 +15,7 @@ import gSPEI as gSPEI
 
 ## Labels: (P)arametric or (NP)nonparametric;
 ## Standardization (1) lumped or (2) split by starting month
-fpath_NP2 = './data/SPEI_Files/variable_stom_conduct/'
+fpath_NP2 = './data/SPEI_Files/nonparametric-var_stom_c/'
 
 ## Settings in filenames
 integration_times = np.arange(3, 28, 4) # all SPEI integration times used

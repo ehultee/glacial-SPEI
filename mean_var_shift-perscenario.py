@@ -46,8 +46,15 @@ for m in modelnames:
     SPEI_by_model_8p5[m]['diff'] = SPEI_by_model_8p5[m]['WRunoff'] - SPEI_by_model_8p5[m]['NRunoff']
 
 ## Re-structure dictionary and create pandas DataFrames aggregated by basin
-SPEI_by_basin_4p5 = gSPEI.sort_models_to_basins(SPEI_by_model_4p5)
-SPEI_by_basin_8p5 = gSPEI.sort_models_to_basins(SPEI_by_model_8p5)
+SPEI_by_basin_4p5_raw = gSPEI.sort_models_to_basins(SPEI_by_model_4p5)
+SPEI_by_basin_8p5_raw = gSPEI.sort_models_to_basins(SPEI_by_model_8p5)
+SPEI_by_basin_4p5 = {b: {} for b in basin_names}
+SPEI_by_basin_8p5 = {b: {} for b in basin_names}
+
+for b in basin_names:
+    for c in cases:
+        SPEI_by_basin_4p5[b][c] = SPEI_by_basin_4p5_raw[b][c].fillna(method='ffill')
+        SPEI_by_basin_8p5[b][c] = SPEI_by_basin_8p5_raw[b][c].fillna(method='ffill')
 
 ## Calculate changes due to glacial effect at end of century, using ensemble approach
 meandiff_4p5, quantile_spread_4p5 = gSPEI.ensemble_glacial_meandiff(SPEI_by_basin_4p5)
