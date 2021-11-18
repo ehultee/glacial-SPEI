@@ -391,7 +391,7 @@ def find_droughts(series, threshold=-1, period=(1980, 2100), t_array=yrs):
     Returns
     -------
     droughts : OrderedDict
-        SPEI values sorted into droughts, with dict keys the indices in yrs of drought onset.
+        SPEI values sorted into droughts, with dict keys the indices in yrs of drought ending.
 
     """
     start_idx = np.argwhere(t_array >= period[0])[0]
