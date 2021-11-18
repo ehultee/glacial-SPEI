@@ -3,6 +3,7 @@ Code to quantify the effect of including glacial runoff in Standardized Precipit
 
 ## Collaborators
 - Sloan Coats (University of Hawaii)
+- Jonathan Mackay (British Geological Survey)
 - Lizz Ultee (Massachusetts Institute of Technology)
 
 ## What's included
