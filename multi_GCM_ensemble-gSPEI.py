@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from matplotlib.patches import Rectangle
 import gSPEI as gSPEI
 
 fpath = './data/SPEI_Files/nonparametric-var_stom_c/'
@@ -44,7 +45,8 @@ SPEI_by_basin_raw = gSPEI.sort_models_to_basins(SPEI_by_model)
 SPEI_by_basin = {b: {} for b in basin_names}
 for b in basin_names:
     for c in cases:
-        SPEI_by_basin[b][c] = SPEI_by_basin_raw[b][c].fillna(method='bfill')
+        # SPEI_by_basin[b][c] = SPEI_by_basin_raw[b][c].fillna(method='bfill')
+        SPEI_by_basin[b][c] = SPEI_by_basin_raw[b][c].fillna(-3)
 
 ## Compute multi-GCM ensemble means and quartiles
 example_b = 'COPPER'
