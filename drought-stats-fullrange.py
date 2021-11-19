@@ -76,7 +76,7 @@ dec_color=color_fam(17)
 
 fig3, ((ax1,ax2, ax3), 
        # (ax4,ax5,ax6), 
-       (ax7,ax8,ax9)) = plt.subplots(3,3, sharex=True, sharey='row', figsize=(10,12))
+       (ax7,ax8,ax9)) = plt.subplots(2,3, sharex=True, sharey='row', figsize=(10,12))
 for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
     pg = ag/a # percent glaciated
     number_b = []
@@ -102,67 +102,67 @@ for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
    
     ## Color code changes over time
     midC_v_hist_n = np.nanmean(number_midC)-np.nanmean(number_b)
-    if midC_v_hist_n >0: # buffering on number increasing
+    if midC_v_hist_n >0.1: # buffering on number increasing
         midC_color_n=inc_color
         midC_marker_n='^'
-    elif midC_v_hist_n==0:
-        midC_color_n='k'
-        midC_marker_n='o'
-    elif midC_v_hist_n<0:
+    elif midC_v_hist_n<-0.1:
         midC_color_n=dec_color
         midC_marker_n='v'
+    else:
+        midC_color_n='k'
+        midC_marker_n='o'
     endC_v_hist_n = np.nanmean(number_endC)-np.nanmean(number_b)
-    if endC_v_hist_n >0:
+    if endC_v_hist_n >0.1:
         endC_color_n=inc_color
         endC_marker_n='^'
-    elif endC_v_hist_n==0:
-        endC_color_n='k'
-        endC_marker_n='o'
-    elif endC_v_hist_n<0:
+    elif endC_v_hist_n<-0.1:
         endC_color_n=dec_color
         endC_marker_n='v'
+    else:
+        endC_color_n='k'
+        endC_marker_n='o'
         
     midC_v_hist_d = np.nanmean(duration_midC)-np.nanmean(duration_b)
-    if midC_v_hist_d >0: # buffering on duration increasing
+    if midC_v_hist_d >0.1: # buffering on duration increasing
         midC_color_d=inc_color
         midC_marker_d='^'
-    elif midC_v_hist_d==0:
-        midC_color_d='k'
-        midC_marker_d='o'
-    elif midC_v_hist_d<0:
+    elif midC_v_hist_d<-0.1:
         midC_color_d=dec_color
         midC_marker_d='v'
+    else:
+        midC_color_d='k'
+        midC_marker_d='o'
     endC_v_hist_d = np.nanmean(duration_endC)-np.nanmean(duration_b)
-    if endC_v_hist_d >0:
+    if endC_v_hist_d >0.1:
         endC_color_d=inc_color
         endC_marker_d='^'
-    elif endC_v_hist_d==0:
-        endC_color_d='k'
-        endC_marker_d='o'
-    elif endC_v_hist_d<0:
+    elif endC_v_hist_d<-0.1:
         endC_color_d=dec_color
         endC_marker_d='v'
+    else:
+        endC_color_d='k'
+        endC_marker_d='o'
         
     midC_v_hist_s = np.nanmean(severity_midC)-np.nanmean(severity_b)
-    if midC_v_hist_s >0: # buffering on duration increasing
+    if midC_v_hist_s >0.1: # buffering on duration increasing
         midC_color_s=inc_color
         midC_marker_s='^'
-    elif midC_v_hist_s==0:
-        midC_color_s='k'
-        midC_marker_s='o'
-    elif midC_v_hist_s<0:
+    elif midC_v_hist_s<-0.1:
         midC_color_s=dec_color
         midC_marker_s='v'
+    else:
+        midC_color_s='k'
+        midC_marker_s='o'
     endC_v_hist_s = np.nanmean(severity_endC)-np.nanmean(severity_b)
-    if endC_v_hist_s >0:
+    if endC_v_hist_s >0.1:
         endC_color_s=inc_color
         endC_marker_s='^'
-    elif endC_v_hist_s==0:
-        endC_color_s='k'
-        endC_marker_s='o'
-    elif endC_v_hist_s<0:
+    elif endC_v_hist_s<-0.1:
         endC_color_s=dec_color
         endC_marker_s='v'
+    else:
+        endC_color_s='k'
+        endC_marker_s='o'
     ## First column: historical
     ax1.errorbar(pg, np.nanmean(number_b), 
                  yerr=((np.nanmean(number_b)-np.nanmin(number_b), np.nanmax(number_b)-np.nanmean(number_b)),), 
