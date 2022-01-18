@@ -50,13 +50,16 @@ for b in basin_names:
 
 
 ## Four-basin example for manuscript
-color_fam = cm.get_cmap('tab20b')
-color_with = color_fam(0)
-color_no = color_fam(10)
+# color_fam = cm.get_cmap('tab20b') 
+# color_with = color_fam(0)
+# color_no = color_fam(10)
+color_with='darkblue' ## going with slightly brighter colours on recc of R2
+color_no='gold'
 fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True, 
                                               tight_layout=True, figsize=(9,6))
 example_basins = ('COPPER', 'TARIM', 'RHONE', 'MAJES')
-for example_b, ax in zip(example_basins, (ax1,ax2,ax3,ax4)):
+example_regions = ('NA','AS','EU','SA')
+for example_b, example_r, ax in zip(example_basins, example_regions, (ax1,ax2,ax3,ax4)):
     r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'WRunoff').rolling(window=12*30).mean()
     r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'NRunoff').rolling(window=12*30).mean()
     rm = SPEI_by_basin[example_b]['WRunoff'].rolling(window=12*30, axis=0).mean()
@@ -75,14 +78,14 @@ for example_b, ax in zip(example_basins, (ax1,ax2,ax3,ax4)):
     # for i in range(len(modelnames)):
     #     ax.plot(yrs, single_models_w[i], color=colors_w[i], alpha=0.5)
     #     ax.plot(yrs, single_models_n[i], color=colors_n[i], alpha=0.5)
-    ax.fill_between(yrs, rm_q1, rm_q3, color=color_with, alpha=0.4)
-    ax.fill_between(yrs, rm_q1_n, rm_q3_n, color=color_no, alpha=0.4)
+    ax.fill_between(yrs, rm_q1, rm_q3, color=color_with, alpha=0.5)
+    ax.fill_between(yrs, rm_q1_n, rm_q3_n, color=color_no, alpha=0.5)
     ax.tick_params(axis='both', labelsize=12)
     ax.set_xticks([2000, 2050, 2100])
     ax.set_xlim(1980, 2100)
     extra = Rectangle((0,0), 0.1, 0.1, fc='w', fill=False, 
                       edgecolor='none', linewidth=0)
-    leg = ax.legend([extra], [example_b], loc='best', 
+    leg = ax.legend([extra], ['{} ({})'.format(example_b,example_r)], loc='best', 
                     handlelength=0, handletextpad=0, fancybox=True,
                     prop={'size':13})
 for ax in (ax3, ax4):
