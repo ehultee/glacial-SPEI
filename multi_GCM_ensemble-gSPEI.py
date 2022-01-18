@@ -48,63 +48,6 @@ for b in basin_names:
         # SPEI_by_basin[b][c] = SPEI_by_basin_raw[b][c].fillna(method='bfill')
         SPEI_by_basin[b][c] = SPEI_by_basin_raw[b][c].fillna(-3)
 
-## Compute multi-GCM ensemble means and quartiles
-example_b = 'COPPER'
-r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'WRunoff').rolling(window=12*30).mean()
-r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'NRunoff').rolling(window=12*30).mean()
-rm = SPEI_by_basin[example_b]['WRunoff'].rolling(window=12*30, axis=0).mean()
-rm_q1 = rm.quantile(q=0.25, axis=1)
-rm_q3 = rm.quantile(q=0.75, axis=1)
-rm_n = SPEI_by_basin[example_b]['NRunoff'].rolling(window=12*30, axis=0).mean()
-rm_q1_n = rm_n.quantile(q=0.25, axis=1)
-rm_q3_n = rm_n.quantile(q=0.75, axis=1)
-
-## Make example figure
-# single_models_w = [SPEI_by_basin[example_b]['WRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
-# single_models_n = [SPEI_by_basin[example_b]['NRunoff'][m].rolling(window=12*30).mean() for m in modelnames]
-
-
-# colors_w = cm.get_cmap('Blues')(np.linspace(0.2, 1, num=len(modelnames)))
-# colors_n = cm.get_cmap('Wistia')(np.linspace(0.2, 1, num=len(modelnames)))
-# fig, ax = plt.subplots()
-# ax.plot(yrs, r_w, 'k', linewidth=3.0)
-# ax.plot(yrs, rm_q1, 'k')
-# ax.plot(yrs, rm_q3, 'k')
-# ax.plot(yrs, r_n, 'k', linewidth=3.0, ls=':')
-# ax.plot(yrs, rm_q1_n, 'k', ls=':')
-# ax.plot(yrs, rm_q3_n, 'k', ls=':')
-# for i in range(len(modelnames)):
-#     ax.plot(yrs, single_models_w[i], color=colors_w[i], alpha=0.5)
-#     ax.plot(yrs, single_models_n[i], color=colors_n[i], alpha=0.5)
-# ax.fill_between(yrs, rm_q1, rm_q3, color='DarkBlue', alpha=0.2)
-# ax.fill_between(yrs, rm_q1_n, rm_q3_n, color='DarkOrange', alpha=0.2)
-# ax.tick_params(axis='both', labelsize=12)
-# ax.set_xticks([2000, 2050, 2100])
-# ax.set_xlim(1980, 2100)
-# ax.set_xlabel('Years', fontsize=14)
-# ax.set_ylabel('Rolling mean SPEI', fontsize=14)
-# plt.tight_layout()
-
-
-# ## Calculate changes due to glacial effect at end of century, using ensemble approach
-# bas_glac_meandiff, quantile_spread = gSPEI.ensemble_glacial_meandiff(SPEI_by_basin)
-# bas_glac_vardiff, var_spread = gSPEI.ensemble_glacial_vardiff(SPEI_by_basin)
-# ## Calculate median of mean shift and full multi-GCM range, for comparison
-# bas_glac_meanmed, mean_spread_full = gSPEI.glacial_meandiff(SPEI_by_model)
-# bas_glac_varmed, var_spread_full = gSPEI.glacial_vardiff(SPEI_by_model)
-
-# fig1, ax1 = plt.subplots(figsize=(5,4))
-# ax1.axhline(y=0, ls=':', color='Grey', alpha=0.5)
-# ax1.axvline(x=0, ls=':', color='Grey', alpha=0.5)
-# ax1.errorbar(x=bas_glac_meandiff, y=bas_glac_vardiff, xerr=quantile_spread, yerr=var_spread, ls='', marker='d', elinewidth=2.0, color='DarkBlue')
-# ax1.errorbar(x=bas_glac_meandiff, y=bas_glac_vardiff, xerr=mean_spread_full, yerr=var_spread_full, ls='', marker='d', elinewidth=1.0, color='DarkBlue', alpha=0.5) #extend whiskers to full range
-# ax1.set_xlabel('Difference in mean SPEI', fontsize=16)
-# ax1.set_ylabel('Difference in SPEI variance', fontsize=16)
-# ax1.set(ylim=(-1.5, 1.0), xlim=(-0.5, 4))
-# ax1.tick_params(axis='both', labelsize=12)
-# plt.tight_layout()
-# plt.show()
-
 
 ## Four-basin example for manuscript
 color_fam = cm.get_cmap('tab20b')
