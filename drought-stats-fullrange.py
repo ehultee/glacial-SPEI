@@ -74,6 +74,11 @@ color_fam = cm.get_cmap('tab20b')
 inc_color=color_fam(5)
 dec_color=color_fam(17)
 
+count_pbuff_num = 0
+count_pbuff_sev = 0
+count_nbuff_num = 0
+count_nbuff_sev = 0
+
 fig3, ((ax1,ax2, ax3), 
        # (ax4,ax5,ax6), 
        (ax7,ax8,ax9)) = plt.subplots(2,3, sharex=True, sharey='row', figsize=(10,12))
@@ -100,6 +105,16 @@ for b, a, ag in zip(basin_names, BasinArea, basin_glacier_area):
         severity_midC.append(-1*(basin_stats_bymodel_midC[m][b][2][1]-basin_stats_bymodel_midC[m][b][2][0]))
         severity_endC.append(-1*(basin_stats_bymodel_endC[m][b][2][1]-basin_stats_bymodel_endC[m][b][2][0]))
    
+    ## Count pos vs neg buffering
+    if np.nanmean(number_b)>0:
+        count_pbuff_num +=1
+    elif np.nanmean(number_b)<0:
+        count_nbuff_num +=1
+    if np.nanmean(severity_b)>0:
+        count_pbuff_sev +=1
+    elif np.nanmean(severity_b)<0:
+        count_nbuff_sev +=1
+    
     ## Color code changes over time
     midC_v_hist_n = np.nanmean(number_midC)-np.nanmean(number_b)
     if midC_v_hist_n >0.1: # buffering on number increasing
