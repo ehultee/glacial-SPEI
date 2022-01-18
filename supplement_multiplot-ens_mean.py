@@ -47,18 +47,7 @@ SPEI_by_basin_raw = gSPEI.sort_models_to_basins(SPEI_by_model)
 SPEI_by_basin = {b: {} for b in basin_names}
 for b in basin_names:
     for c in cases:
-        SPEI_by_basin[b][c] = SPEI_by_basin_raw[b][c].fillna(method='bfill')
-
-## Compute multi-GCM ensemble means and quartiles
-example_b = 'COPPER'
-r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'WRunoff').rolling(window=12*30).mean()
-r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'NRunoff').rolling(window=12*30).mean()
-rm = SPEI_by_basin[example_b]['WRunoff'].rolling(window=12*30, axis=0).mean()
-rm_q1 = rm.quantile(q=0.25, axis=1)
-rm_q3 = rm.quantile(q=0.75, axis=1)
-rm_n = SPEI_by_basin[example_b]['NRunoff'].rolling(window=12*30, axis=0).mean()
-rm_q1_n = rm_n.quantile(q=0.25, axis=1)
-rm_q3_n = rm_n.quantile(q=0.75, axis=1)
+        SPEI_by_basin[b][c] = SPEI_by_basin_raw[b][c].fillna(-3)
 
 
 ## Multi-page plotting - 2 pages of 7x4
