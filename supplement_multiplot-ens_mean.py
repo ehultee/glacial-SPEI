@@ -31,6 +31,18 @@ basin_names = ['INDUS','TARIM','BRAHMAPUTRA','ARAL SEA','COPPER','GANGES','YUKON
 'LULE','RAPEL','SANTA','SKAGIT','KUBAN','TITICACA','NUSHAGAK','BIOBIO','IRRAWADDY','NEGRO','MAJES','CLUTHA','DAULE-VINCES',
 'KALIXAELVEN','MAGDALENA','DRAMSELV','COLVILLE']
 
+regions = ['AS', 'AS', 'AS', 'AS', 'NA',
+           'AS', 'NA', 'NA', 'NA', 'AS',
+           'NA', 'SA', 'NA', 'SA', 'AS',
+           'AS', 'NA', 'AS', 'SA', 'SA',
+           'NA', 'NA', 'NA', 'EU', 'EU',
+           'NA', 'EU', 'NA', 'AS', 'EU',
+           'AS', 'EU', 'NA', 'EU', 'AS',
+           'EU', 'EU', 'AS', 'AS', 'EU',
+           'SA', 'SA', 'NA', 'AS', 'SA',
+           'NA', 'SA', 'AS', 'SA', 'SA',
+           'NZ', 'SA', 'EU', 'SA', 'EU', 'NA'] ## region tag of each basin above
+
 yrs = np.linspace(1900, 2101, num=2412)
 
 ## Read all in to dict by GCM as in other gSPEI scripts
@@ -53,16 +65,21 @@ for b in basin_names:
 ## Multi-page plotting - 2 pages of 7x4
 batch_size = 20
 batched_basins = [basin_names[i:i+batch_size] for i in range(0, len(basin_names), batch_size)]
-color_fam = cm.get_cmap('tab20b')
+batched_regions = [regions[i:i+batch_size] for i in range(0, len(basin_names), batch_size)]
+# color_fam = cm.get_cmap('tab20b')
+color_with='darkblue' ## going with slightly brighter colours on recc of R2
+color_no='gold'
 
 
 for k in range(len(batched_basins)): ## looping over pages
     fig, axs = plt.subplots(nrows=5, ncols=4, sharex=True, sharey=True,
                            figsize=(8,10), tight_layout=True)
     batch = batched_basins[k]
+    batch_r = batched_regions[k]
     
     for i in range(len(batch)):
         example_b = batch[i]
+        example_r = batch_r[i]
         r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'WRunoff').rolling(window=12*30).mean()
         r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'NRunoff').rolling(window=12*30).mean()
         rm = SPEI_by_basin[example_b]['WRunoff'].rolling(window=12*30, axis=0).mean()
@@ -80,8 +97,8 @@ for k in range(len(batched_basins)): ## looping over pages
         ax.plot(yrs, r_n, 'k', linewidth=3.0, ls=':')
         ax.plot(yrs, rm_q1_n, 'k', ls=':')
         ax.plot(yrs, rm_q3_n, 'k', ls=':')
-        ax.fill_between(yrs, rm_q1, rm_q3, color=color_fam(0), alpha=0.4)
-        ax.fill_between(yrs, rm_q1_n, rm_q3_n, color=color_fam(10), alpha=0.4)
+        ax.fill_between(yrs, rm_q1, rm_q3, color=color_with, alpha=0.4)
+        ax.fill_between(yrs, rm_q1_n, rm_q3_n, color=color_no, alpha=0.4)
         ax.tick_params(axis='both', labelsize=12)
         ax.set(xlim=(1980,2100), ylim=(-1, 1.5), xticks=[2000,2050,2100], 
                yticks=(-1, 0, 1))
@@ -89,7 +106,7 @@ for k in range(len(batched_basins)): ## looping over pages
         #         ha='left', size=12, weight=500, color='k')
         extra = Rectangle((0,0), 0.1, 0.1, fc='w', fill=False, 
                           edgecolor='none', linewidth=0)
-        leg = ax.legend([extra], [example_b], loc='best', 
+        leg = ax.legend([extra], ['{} ({})'.format(example_b,example_r)], loc='best', 
                         handlelength=0, handletextpad=0, fancybox=True)
         if i%4==0: ## label leftmost axes
             ax.set_ylabel('Roll. mean SPEI')
