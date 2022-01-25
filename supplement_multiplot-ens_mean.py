@@ -70,7 +70,6 @@ batched_regions = [regions[i:i+batch_size] for i in range(0, len(basin_names), b
 color_with='darkblue' ## going with slightly brighter colours on recc of R2
 color_no='gold'
 
-
 for k in range(len(batched_basins)): ## looping over pages
     fig, axs = plt.subplots(nrows=5, ncols=4, sharex=True, sharey=True,
                            figsize=(8,10), tight_layout=True)
@@ -119,5 +118,7 @@ for k in range(len(batched_basins)): ## looping over pages
             fig.delaxes(axs.ravel()[j])
     fig.align_ylabels()
     fig.tight_layout()
+    fig.set_size_inches(8.00, 9.58)
+    fig.savefig('/Users/lizz/Desktop/20220122-batched_recolored_basins-p{}'.format(k+1))
     plt.show()
 
