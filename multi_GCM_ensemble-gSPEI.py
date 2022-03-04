@@ -59,7 +59,8 @@ fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex=True,
                                               tight_layout=True, figsize=(9,6))
 example_basins = ('COPPER', 'TARIM', 'RHONE', 'MAJES')
 example_regions = ('NA','AS','EU','SA')
-for example_b, example_r, ax in zip(example_basins, example_regions, (ax1,ax2,ax3,ax4)):
+example_pgs = ('20%', '2.3%', '0.9%', '0.3%')
+for example_b, example_r, example_pg, ax in zip(example_basins, example_regions, example_pgs, (ax1,ax2,ax3,ax4)):
     r_w = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'WRunoff').rolling(window=12*30).mean()
     r_n = gSPEI.basin_ensemble_mean(SPEI_by_basin, example_b, 'NRunoff').rolling(window=12*30).mean()
     rm = SPEI_by_basin[example_b]['WRunoff'].rolling(window=12*30, axis=0).mean()
@@ -83,9 +84,13 @@ for example_b, example_r, ax in zip(example_basins, example_regions, (ax1,ax2,ax
     ax.tick_params(axis='both', labelsize=12)
     ax.set_xticks([2000, 2050, 2100])
     ax.set_xlim(1980, 2100)
-    extra = Rectangle((0,0), 0.1, 0.1, fc='w', fill=False, 
+    extra1 = Rectangle((0,0), 0.1, 0.1, fc='w', fill=False, 
                       edgecolor='none', linewidth=0)
-    leg = ax.legend([extra], ['{} ({})'.format(example_b,example_r)], loc='best', 
+    extra2 = Rectangle((0,0), 0.1, 0.1, fc='w', fill=False, 
+                  edgecolor='none', linewidth=0)
+    leg = ax.legend([extra1, extra2], 
+                    ['{}'.format(example_b), '({}, {})'.format(example_r, example_pg)], 
+                    loc='best', 
                     handlelength=0, handletextpad=0, fancybox=True,
                     prop={'size':13})
 for ax in (ax3, ax4):
