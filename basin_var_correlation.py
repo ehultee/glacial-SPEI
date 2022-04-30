@@ -113,3 +113,29 @@ rho_s_m = stats.spearmanr(percent_glac, mean_severity_midC)
 rho_n_e = stats.spearmanr(percent_glac, mean_number_endC)
 rho_d_e = stats.spearmanr(percent_glac, mean_duration_endC)
 rho_s_e = stats.spearmanr(percent_glac, mean_severity_endC)
+
+## Compute Spearman's corrs with other variables for comparison
+constructor_d = {}
+for f,name in zip((percent_glac, BasinArea, avg_precip, historical_avg_AI), 
+             ('percent_glac', 'BasinArea', 'avg_precip', 'historical_avg_AI')):
+    if sum(np.isnan(f))>0:
+        print('Warning: NaNs identified in field {}'.format(name))
+        fn = np.asarray(f)[~np.isnan(f)] # there is a single NaN in AI
+        mean_number_b = np.asarray(mean_number_b)[~np.isnan(f)]
+        mean_severity_b = np.asarray(mean_severity_b)[~np.isnan(f)]
+        mean_number_midC = np.asarray(mean_number_midC)[~np.isnan(f)]
+        mean_severity_midC = np.asarray(mean_severity_midC)[~np.isnan(f)]
+        mean_number_endC = np.asarray(mean_number_endC)[~np.isnan(f)]
+        mean_severity_endC = np.asarray(mean_severity_endC)[~np.isnan(f)]
+    else: 
+        fn = f
+        
+    d = {'Number-hist': stats.spearmanr(fn, mean_number_b), 
+         'Severity-hist': stats.spearmanr(fn, mean_severity_b), 
+         'Number-midC': stats.spearmanr(fn, mean_number_midC), 
+         'Severity-midC': stats.spearmanr(fn, mean_severity_midC), 
+         'Number-endC': stats.spearmanr(fn, mean_number_endC), 
+         'Severity-endC': stats.spearmanr(fn, mean_severity_endC)}
+    constructor_d[name] = d
+df = pd.DataFrame.from_dict(constructor_d)
+
