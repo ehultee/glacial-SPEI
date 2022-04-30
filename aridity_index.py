@@ -54,9 +54,10 @@ for i, b in enumerate(basin_names):
         for m in modelnames:
             tempdict_pet[m] = PET_by_model[m][s][i] 
             tempdict_p[m] = P_by_model[m][s][i]
-            tempdict_ai[m] = np.nanmedian(P_by_model[m][s][i][0:959])/np.nanmedian(PET_by_model[m][s][i][0:959]) # historical avg(P)/avg(PET) for this model
+            tempdict_ai[m] = np.nanmedian(tempdict_p[m][0:959])/np.nanmedian(tempdict_pet[m][0:959]) # historical avg(P)/avg(PET) for this model
             if tempdict_ai[m]<0:
-                tempdict_ai[m] = np.nan
+                # tempdict_ai[m] = np.nan
+                tempdict_ai[m] = np.abs(tempdict_ai[m])
         PET_by_basin[b][s] = pd.DataFrame.from_dict(tempdict_pet)
         P_by_basin[b][s] = pd.DataFrame.from_dict(tempdict_p)
         AI_by_basin[b][s] = np.nanmedian([tempdict_ai[m] for m in modelnames])
