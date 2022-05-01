@@ -1,5 +1,6 @@
 # glacial-SPEI
 Code to quantify the effect of including glacial runoff in Standardized Precipitation Evapotranspiration Index (SPEI).
+[![DOI](https://zenodo.org/badge/205238173.svg)](https://zenodo.org/badge/latestdoi/205238173)
 
 ## Collaborators
 - Sloan Coats (University of Hawaii)
