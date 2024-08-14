@@ -1,4 +1,4 @@
-
+.ipynb_checkpoints/*
 *.pyc
 data/.DS_Store
 .ipynb_checkpoints/SPEI-analysis-checkpoint.ipynb
@@ -6,3 +6,15 @@ data/.DS_Store
 .ipynb_checkpoints/SPEI-analysis-checkpoint.py
 .ipynb_checkpoints/gSPEI-checkpoint.py
 .ipynb_checkpoints/multi_GCM_ensemble-gSPEI-checkpoint.py
+.ipynb_checkpoints/20230710-SPEI_per_glacier_model-checkpoint.ipynb
+.ipynb_checkpoints/20231005-SPEI_per_glacier_model-checkpoint.ipynb
+.ipynb_checkpoints/20231109-multi_GEM-drought_stats-checkpoint.ipynb
+.ipynb_checkpoints/20240215-multi_GEM-buffering_vs_aridity-checkpoint.ipynb
+.ipynb_checkpoints/20240618-precip_analysis-checkpoint.ipynb
+.ipynb_checkpoints/basin_var_correlation-checkpoint.py
+.ipynb_checkpoints/drought-stats-fullrange-checkpoint.py
+.ipynb_checkpoints/highlight_severity_fig-checkpoint.py
+.ipynb_checkpoints/kmeans-checkpoint.py
+.ipynb_checkpoints/supp_figure-itime-checkpoint.py
+.ipynb_checkpoints/supplement_multiplot-ens_mean-checkpoint.py
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
